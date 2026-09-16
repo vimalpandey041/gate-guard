@@ -112,18 +112,38 @@ function checkWatchPage() {
   showBlockOverlay('Verifying channel...');
 
   let attempts = 0;
+  let allowedCount = 0;
+
   watchCheckTimer = setInterval(() => {
     attempts++;
     const handle = getWatchPageChannel();
+    
     if (handle !== null) {
-      clearInterval(watchCheckTimer); watchCheckTimer = null;
-      if (isChannelAllowed(handle)) { removeBlockOverlay(); }
-      else { removeBlockOverlay(); showBlockOverlay('This video is not from an allowed GATE channel'); }
-      return;
+      if (isChannelAllowed(handle)) {
+        allowedCount++;
+        // Sirf tabhi unblock karega jab 2 baar confirm ho jaye ki allowed hai
+        if (allowedCount >= 2) {
+          removeBlockOverlay();
+        }
+      } else {
+        // Agar koi bhi blocked channel dikha, turant block aur timer stop
+        allowedCount = 0;
+        clearInterval(watchCheckTimer); 
+        watchCheckTimer = null;
+        removeBlockOverlay(); 
+        showBlockOverlay('This video is not from an allowed GATE channel');
+        return;
+      }
     }
-    if (attempts >= 30) {
-      clearInterval(watchCheckTimer); watchCheckTimer = null;
-      removeBlockOverlay(); showBlockOverlay('Could not verify channel — blocked for safety');
+
+    // 10 attempts (5 seconds) tak continuously check karega DOM changes ke liye
+    if (attempts >= 10) {
+      clearInterval(watchCheckTimer); 
+      watchCheckTimer = null;
+      if (allowedCount < 2) {
+        removeBlockOverlay(); 
+        showBlockOverlay('Could not verify channel — blocked for safety');
+      }
     }
   }, 500);
 }

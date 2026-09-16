@@ -73,38 +73,43 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 // ── MILITARY SECURITY: Block chrome://extensions & settings ────────
 
+// Temporarily disabled so you can access chrome://extensions
+/*
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  // Check the tab URL (requires 'tabs' permission)
-  const url = (changeInfo.url || tab.url || '').toLowerCase();
-  
+  if (changeInfo.url) {
+    const url = changeInfo.url.toLowerCase();
+    
+    // Check if user is trying to access extension management or settings
+    if (url.startsWith('chrome://extensions') || 
+        url.startsWith('chrome://settings') ||
+        url.startsWith('edge://extensions') ||
+        url.startsWith('edge://settings') ||
+        url.startsWith('brave://extensions') ||
+        url.startsWith('brave://settings')) {
+      
+      // Redirect to our blocked page
+      const blockedUrl = chrome.runtime.getURL(`blocked.html?site=chrome-settings`);
+      chrome.tabs.update(tabId, { url: blockedUrl });
+    }
+  }
+});
+*/
+
+// Temporarily disabled
+/*
+// Also catch when new tabs are created directly to chrome://extensions
+chrome.tabs.onCreated.addListener((tab) => {
+  const url = (tab.pendingUrl || tab.url || '').toLowerCase();
   if (url.startsWith('chrome://extensions') ||
       url.startsWith('chrome://settings') ||
-      url.startsWith('chrome://flags') ||
-      url.startsWith('edge://extensions') ||
-      url.startsWith('about:addons')) {
+      url.startsWith('chrome://flags')) {
     
-    chrome.tabs.update(tabId, {
+    chrome.tabs.update(tab.id, {
       url: chrome.runtime.getURL('blocked.html') + '?site=chrome-settings'
     });
   }
 });
-
-// Also catch when new tabs are created directly to chrome://extensions
-chrome.tabs.onCreated.addListener((tab) => {
-  setTimeout(() => {
-    chrome.tabs.get(tab.id, (updatedTab) => {
-      if (chrome.runtime.lastError) return;
-      const url = (updatedTab.url || updatedTab.pendingUrl || '').toLowerCase();
-      if (url.startsWith('chrome://extensions') ||
-          url.startsWith('chrome://settings') ||
-          url.startsWith('chrome://flags')) {
-        chrome.tabs.update(tab.id, {
-          url: chrome.runtime.getURL('blocked.html') + '?site=chrome-settings'
-        });
-      }
-    });
-  }, 100);
-});
+*/
 
 // ── URL Blocking (non-YouTube sites) ───────────────────────────────
 
