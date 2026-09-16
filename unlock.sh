@@ -15,7 +15,8 @@ echo "  ══════════════════════"
 echo ""
 
 defaults delete com.google.Chrome URLBlocklist 2>/dev/null || true
-
+launchctl unload ~/Library/LaunchAgents/com.gateguard.browserkiller.plist 2>/dev/null || true
+rm -f ~/Library/LaunchAgents/com.gateguard.browserkiller.plist
 echo "  ✅ Chrome policies removed!"
 echo ""
 echo "  ⚠️  Fully quit Chrome (Cmd + Q) and reopen it."

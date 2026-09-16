@@ -73,8 +73,6 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 // ── MILITARY SECURITY: Block chrome://extensions & settings ────────
 
-// Temporarily disabled so you can access chrome://extensions
-/*
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     const url = changeInfo.url.toLowerCase();
@@ -93,10 +91,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     }
   }
 });
-*/
 
-// Temporarily disabled
-/*
 // Also catch when new tabs are created directly to chrome://extensions
 chrome.tabs.onCreated.addListener((tab) => {
   const url = (tab.pendingUrl || tab.url || '').toLowerCase();
@@ -109,7 +104,6 @@ chrome.tabs.onCreated.addListener((tab) => {
     });
   }
 });
-*/
 
 // ── URL Blocking (non-YouTube sites) ───────────────────────────────
 

@@ -25,6 +25,11 @@ echo "  Locking Chrome via macOS defaults..."
 # Apply macOS level policies for Chrome
 defaults write com.google.Chrome URLBlocklist -array "chrome://extensions" "chrome://extensions/*" "chrome://settings" "chrome://settings/*" "chrome://flags" "chrome://flags/*"
 
+echo "  Enabling Safari/Brave blocker..."
+chmod +x "/Volumes/Development/gate/browser_killer.sh"
+mkdir -p ~/Library/LaunchAgents
+cp "/Volumes/Development/gate/com.gateguard.browserkiller.plist" ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.gateguard.browserkiller.plist 2>/dev/null || true
 echo ""
 echo "  ✅ Chrome Locked successfully!"
 echo ""
