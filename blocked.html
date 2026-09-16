@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Blocked — GATE Guard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0a0a0f;
+      color: #e4e4e7;
+      min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; position: relative;
+    }
+
+    body::before, body::after {
+      content: ''; position: fixed; border-radius: 50%;
+      filter: blur(120px); opacity: 0.3; z-index: 0;
+      animation: float 8s ease-in-out infinite;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #6d28d9, #4c1d95);
+      top: -150px; right: -100px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #dc2626, #991b1b);
+      bottom: -100px; left: -80px;
+      animation-delay: -4s;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translate(0,0) scale(1); }
+      50% { transform: translate(30px,-30px) scale(1.05); }
+    }
+
+    .container {
+      position: relative; z-index: 1;
+      max-width: 500px; width: 90%;
+      text-align: center; padding: 2rem;
+    }
+
+    .shield-icon {
+      width: 80px; height: 80px;
+      margin: 0 auto 1.5rem;
+      background: linear-gradient(135deg, #ef4444, #dc2626, #b91c1c);
+      border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 8px 32px rgba(239,68,68,0.3);
+      animation: pulse-glow 3s ease-in-out infinite;
+    }
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 8px 32px rgba(239,68,68,0.3); }
+      50% { box-shadow: 0 8px 48px rgba(239,68,68,0.5); }
+    }
+    .shield-icon svg { width: 40px; height: 40px; fill: white; }
+
+    h1 {
+      font-size: 2rem; font-weight: 800; margin-bottom: 0.75rem;
+      background: linear-gradient(135deg, #f87171, #fbbf24);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -0.02em;
+    }
+
+    .blocked-site {
+      display: inline-block;
+      padding: 6px 18px; margin-bottom: 1rem;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600; color: #f87171;
+    }
+
+    .subtitle {
+      font-size: 1rem; color: #a1a1aa;
+      line-height: 1.6; font-weight: 400;
+    }
+
+    .footer-text {
+      margin-top: 2rem;
+      font-size: 0.7rem; color: #27272a; font-weight: 400;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="shield-icon">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm-1 14.59l-3.29-3.3 1.41-1.41L11 13.77l4.88-4.88 1.41 1.41L11 16.59z"/>
+      </svg>
+    </div>
+
+    <h1>You're Blocked</h1>
+    <div class="blocked-site" id="blockedSiteName"></div>
+    <p class="subtitle">This page is restricted by GATE Guard to keep you focused on GATE preparation.</p>
+    <p class="footer-text">GATE Guard v2.0 - Military Mode</p>
+  </div>
+
+  <script src="blocked.js"></script>
+
+</body>
+</html>

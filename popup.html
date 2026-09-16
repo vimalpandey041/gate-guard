@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      width: 320px;
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #0c0c14;
+      color: #e4e4e7;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    .header {
+      position: relative;
+      padding: 18px 20px 14px;
+      background: linear-gradient(135deg, rgba(239,68,68,0.12), rgba(220,38,38,0.06));
+      border-bottom: 1px solid rgba(239,68,68,0.12);
+      display: flex; align-items: center; gap: 12px;
+      overflow: hidden;
+    }
+    .header::before {
+      content: ''; position: absolute; top: -40px; right: -40px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, rgba(239,68,68,0.15), transparent);
+      border-radius: 50%; filter: blur(20px);
+    }
+    .logo { width: 36px; height: 36px; border-radius: 10px; object-fit: cover; position: relative; z-index: 1; }
+    .brand { flex: 1; position: relative; z-index: 1; }
+    .brand h1 { font-size: 15px; font-weight: 700; color: #f4f4f5; }
+    .brand span { font-size: 11px; font-weight: 600; color: #ef4444; letter-spacing: 0.03em; }
+
+    /* Status Bar */
+    .status-bar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .lock-icon {
+      width: 28px; height: 28px;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.2);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .lock-icon svg { width: 14px; height: 14px; fill: #ef4444; }
+    .status-text { font-size: 12px; font-weight: 600; color: #ef4444; }
+    .status-sub { font-size: 10px; color: #52525b; }
+
+    /* Section Title */
+    .section-title {
+      padding: 12px 20px 6px;
+      font-size: 10px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: #52525b;
+    }
+
+    /* Blocked List */
+    .list-area {
+      max-height: 250px;
+      overflow-y: auto;
+      padding: 0 14px 6px;
+    }
+    .list-area::-webkit-scrollbar { width: 4px; }
+    .list-area::-webkit-scrollbar-track { background: transparent; }
+    .list-area::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+
+    .list-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transition: all 0.15s;
+    }
+    .list-item:hover { background: rgba(255,255,255,0.03); }
+    .item-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #ef4444; box-shadow: 0 0 6px rgba(239,68,68,0.3);
+      flex-shrink: 0;
+    }
+    .item-name {
+      flex: 1; font-size: 12px; font-weight: 500; color: #d4d4d8;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .item-tag {
+      font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 4px;
+      background: rgba(239,68,68,0.12); color: #f87171;
+      text-transform: uppercase; letter-spacing: 0.04em;
+      flex-shrink: 0;
+    }
+
+    /* Add Row */
+    .add-row {
+      display: flex; gap: 6px;
+      padding: 10px 14px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .add-input {
+      flex: 1; padding: 8px 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 8px;
+      color: #e4e4e7; font-size: 12px;
+      font-family: inherit; outline: none;
+      transition: border-color 0.2s;
+    }
+    .add-input::placeholder { color: #52525b; }
+    .add-input:focus { border-color: rgba(239,68,68,0.4); }
+
+    .add-btn {
+      padding: 8px 14px;
+      background: linear-gradient(135deg, #dc2626, #b91c1c);
+      border: none; border-radius: 8px;
+      color: white; font-size: 11px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+      font-family: inherit; text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .add-btn:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%);
+      padding: 8px 16px;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      border-radius: 8px;
+      color: #22c55e; font-size: 11px; font-weight: 600;
+      opacity: 0; transition: opacity 0.3s;
+      pointer-events: none; z-index: 10;
+    }
+    .toast.show { opacity: 1; }
+    .toast.error { background: rgba(239,68,68,0.15); border-color: rgba(239,68,68,0.3); color: #f87171; }
+
+    /* Footer */
+    .footer {
+      padding: 10px 20px 12px;
+      text-align: center;
+    }
+    .footer p { font-size: 9px; color: #27272a; font-weight: 500; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <img src="icon128.png" class="logo" alt="GATE Guard">
+    <div class="brand">
+      <h1>GATE Guard</h1>
+      <span>LOCKED MODE</span>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar">
+    <div class="lock-icon">
+      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+    </div>
+    <div>
+      <div class="status-text">Protection Permanently Active</div>
+      <div class="status-sub">Cannot be disabled or uninstalled</div>
+    </div>
+  </div>
+
+  <!-- Blocked Sites -->
+  <div class="section-title">Blocked Sites</div>
+  <div class="list-area" id="blockedList"></div>
+
+  <!-- Add Site -->
+  <div class="add-row">
+    <input type="text" class="add-input" id="addInput" placeholder="e.g. tiktok.com">
+    <button class="add-btn" id="addBtn">+ Block</button>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>GATE Guard v2.0 - Military Mode</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
