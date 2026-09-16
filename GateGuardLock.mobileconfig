@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>PayloadContent</key>
+    <array>
+        <dict>
+            <key>ExtensionInstallForcelist</key>
+            <array>
+                <string>nljgbcadenekiedjfbabfiadnjppbakk;https://raw.githubusercontent.com/vimalpandey041/gate-guard/main/release/updates.xml</string>
+            </array>
+            <key>URLBlocklist</key>
+            <array>
+                <string>chrome://extensions</string>
+                <string>chrome://extensions/*</string>
+                <string>chrome://settings</string>
+                <string>chrome://settings/*</string>
+                <string>chrome://flags</string>
+                <string>chrome://flags/*</string>
+            </array>
+            <key>PayloadDisplayName</key>
+            <string>Google Chrome</string>
+            <key>PayloadIdentifier</key>
+            <string>com.google.Chrome</string>
+            <key>PayloadType</key>
+            <string>com.google.Chrome</string>
+            <key>PayloadUUID</key>
+            <string>C5F9C1B2-7A41-4712-B2A4-1234567890AB</string>
+            <key>PayloadVersion</key>
+            <integer>1</integer>
+        </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Force-installs GATE Guard from GitHub and prevents it from being removed.</string>
+    <key>PayloadDisplayName</key>
+    <string>GATE Guard Chrome Lock</string>
+    <key>PayloadIdentifier</key>
+    <string>com.gate.guard.lock</string>
+    <key>PayloadOrganization</key>
+    <string>GATE Guard</string>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>A1B2C3D4-E5F6-4712-890A-BCDEF1234567</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+</dict>
+</plist>
