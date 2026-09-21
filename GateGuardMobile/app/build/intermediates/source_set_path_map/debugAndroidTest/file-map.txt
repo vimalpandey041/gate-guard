@@ -1,0 +1,4 @@
+com.gateguard.dnslock.test.app-androidTest-0 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/generated/res/resValues/androidTest/debug
+com.gateguard.dnslock.test.app-mergeDebugAndroidTestResources-1 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/merged.dir
+com.gateguard.dnslock.test.app-mergeDebugAndroidTestResources-2 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/incremental/debugAndroidTest/mergeDebugAndroidTestResources/stripped.dir
+com.gateguard.dnslock.test.app-merged_res-3 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/merged_res/debugAndroidTest

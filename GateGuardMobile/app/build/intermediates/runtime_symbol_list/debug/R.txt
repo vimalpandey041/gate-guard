@@ -1,0 +1,4 @@
+int drawable ic_shield 0x7f010000
+int string accessibility_desc 0x7f020000
+int xml accessibility_config 0x7f030000
+int xml device_admin_policies 0x7f030001

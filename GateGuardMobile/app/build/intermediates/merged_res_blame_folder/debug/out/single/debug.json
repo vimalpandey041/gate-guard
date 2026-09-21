@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.gateguard.dnslock.app-merged_res-4:/xml_accessibility_config.xml.flat",
+        "source": "com.gateguard.dnslock.app-main-6:/xml/accessibility_config.xml"
+    },
+    {
+        "merged": "com.gateguard.dnslock.app-merged_res-4:/drawable_ic_shield.xml.flat",
+        "source": "com.gateguard.dnslock.app-main-6:/drawable/ic_shield.xml"
+    },
+    {
+        "merged": "com.gateguard.dnslock.app-merged_res-4:/xml_device_admin_policies.xml.flat",
+        "source": "com.gateguard.dnslock.app-main-6:/xml/device_admin_policies.xml"
+    }
+]

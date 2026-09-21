@@ -1,6 +1,7 @@
 /**
- * GATE Guard v2.0 — Content Script (YouTube Filter) — LOCKED DOWN
- * Always active. No toggle. Filters YouTube to show only allowed channels.
+ * GATE Guard v3.1 — Content Script — CLEAN BUILD
+ * Filters YouTube to only allowed GATE channels.
+ * DevTools proof. No video killing. SPA-safe.
  */
 
 const HARDCODED_CHANNELS = [
@@ -10,22 +11,46 @@ const HARDCODED_CHANNELS = [
   "gatewallah_cse_da",
   "Gatecsit-dsai",
   "UnacademyComputerScience",
-  "GfG_GATE"
+  "GfG_GATE",
+  "AmitKhuranaSir"
 ];
 
 let lastUrl = '';
 let watchCheckTimer = null;
 let overlayEl = null;
+let isCurrentPageBlocked = false;
+let guardInterval = null;
+
+// ── Miniplayer Button Hider (CSS only, no JS DOM manipulation) ────
+
+function injectCSS() {
+  if (document.getElementById('gate-guard-css')) return;
+  const style = document.createElement('style');
+  style.id = 'gate-guard-css';
+  style.textContent = `
+    .ytp-miniplayer-button,
+    button[aria-label="Miniplayer"],
+    .ytp-pip-button {
+      display: none !important;
+      pointer-events: none !important;
+    }
+  `;
+  (document.head || document.documentElement).appendChild(style);
+}
+injectCSS();
+
+// ── Helpers ───────────────────────────────────────────────────────
 
 function isChannelAllowed(handle) {
   if (!handle) return false;
   return HARDCODED_CHANNELS.some(ch => ch.toLowerCase() === handle.toLowerCase());
 }
 
-// ── Block overlay ──────────────────────────────────────────────────
+// ── Block Overlay ─────────────────────────────────────────────────
 
 function showBlockOverlay(message) {
-  if (overlayEl) return;
+  if (overlayEl && document.contains(overlayEl)) return;
+  isCurrentPageBlocked = true;
   overlayEl = document.createElement('div');
   overlayEl.id = 'gate-guard-block';
   overlayEl.style.cssText = `
@@ -44,13 +69,33 @@ function showBlockOverlay(message) {
     <a href="https://www.youtube.com/" style="padding:10px 20px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:10px;color:#a78bfa;text-decoration:none;font-size:0.85rem;font-weight:600;">Go to Home</a>
   `;
   (document.documentElement || document.body).appendChild(overlayEl);
+  startOverlayGuard();
+}
+
+function startOverlayGuard() {
+  if (guardInterval) clearInterval(guardInterval);
+  guardInterval = setInterval(() => {
+    if (!isCurrentPageBlocked) {
+      clearInterval(guardInterval);
+      guardInterval = null;
+      return;
+    }
+    const overlay = document.getElementById('gate-guard-block');
+    if (!overlay || !document.contains(overlay)) {
+      clearInterval(guardInterval);
+      guardInterval = null;
+      window.location.replace('https://www.youtube.com/');
+    }
+  }, 200);
 }
 
 function removeBlockOverlay() {
+  isCurrentPageBlocked = false;
+  if (guardInterval) { clearInterval(guardInterval); guardInterval = null; }
   if (overlayEl) { overlayEl.remove(); overlayEl = null; }
 }
 
-// ── Channel extraction ─────────────────────────────────────────────
+// ── Channel Extraction ────────────────────────────────────────────
 
 function extractHandleFromCard(card) {
   const links = card.querySelectorAll('a[href*="/@"]');
@@ -82,7 +127,7 @@ function getWatchPageChannel() {
   return null;
 }
 
-// ── Filter video cards ─────────────────────────────────────────────
+// ── Filter Video Cards ────────────────────────────────────────────
 
 function filterVideoCards() {
   const cards = document.querySelectorAll(
@@ -97,7 +142,6 @@ function filterVideoCards() {
     }
   });
 
-  // Hide shorts shelves
   document.querySelectorAll('ytd-reel-shelf-renderer, ytd-rich-shelf-renderer[is-shorts]').forEach(s => s.style.display = 'none');
   document.querySelectorAll('ytd-rich-section-renderer').forEach(section => {
     const title = section.querySelector('#title-text, .title');
@@ -105,52 +149,65 @@ function filterVideoCards() {
   });
 }
 
-// ── Watch page check ───────────────────────────────────────────────
+// ── Watch Page Check (SPA-safe) ───────────────────────────────────
 
 function checkWatchPage() {
   if (watchCheckTimer) { clearInterval(watchCheckTimer); watchCheckTimer = null; }
+  
+  const expectedUrl = window.location.href;
   showBlockOverlay('Verifying channel...');
 
-  let attempts = 0;
-  let allowedCount = 0;
+  // Wait 1.5s for SPA DOM to update, then start checking
+  setTimeout(() => {
+    let attempts = 0;
+    let allowedCount = 0;
 
-  watchCheckTimer = setInterval(() => {
-    attempts++;
-    const handle = getWatchPageChannel();
-    
-    if (handle !== null) {
-      if (isChannelAllowed(handle)) {
-        allowedCount++;
-        // Sirf tabhi unblock karega jab 2 baar confirm ho jaye ki allowed hai
-        if (allowedCount >= 2) {
-          removeBlockOverlay();
-        }
-      } else {
-        // Agar koi bhi blocked channel dikha, turant block aur timer stop
-        allowedCount = 0;
-        clearInterval(watchCheckTimer); 
+    watchCheckTimer = setInterval(() => {
+      // If URL changed, abort
+      if (window.location.href !== expectedUrl) {
+        clearInterval(watchCheckTimer);
         watchCheckTimer = null;
-        removeBlockOverlay(); 
-        showBlockOverlay('This video is not from an allowed GATE channel');
         return;
       }
-    }
 
-    // 10 attempts (5 seconds) tak continuously check karega DOM changes ke liye
-    if (attempts >= 10) {
-      clearInterval(watchCheckTimer); 
-      watchCheckTimer = null;
-      if (allowedCount < 2) {
-        removeBlockOverlay(); 
-        showBlockOverlay('Could not verify channel — blocked for safety');
+      attempts++;
+      const handle = getWatchPageChannel();
+
+      if (handle !== null) {
+        if (isChannelAllowed(handle)) {
+          allowedCount++;
+          if (allowedCount >= 2) {
+            removeBlockOverlay();
+            clearInterval(watchCheckTimer);
+            watchCheckTimer = null;
+          }
+        } else {
+          allowedCount = 0;
+          clearInterval(watchCheckTimer);
+          watchCheckTimer = null;
+          removeBlockOverlay();
+          showBlockOverlay('This video is not from an allowed GATE channel');
+          return;
+        }
       }
-    }
-  }, 500);
+
+      if (attempts >= 10) {
+        clearInterval(watchCheckTimer);
+        watchCheckTimer = null;
+        if (allowedCount < 2) {
+          removeBlockOverlay();
+          showBlockOverlay('Could not verify channel — blocked for safety');
+        }
+      }
+    }, 500);
+  }, 1500);
 }
 
-// ── Main handler ───────────────────────────────────────────────────
+// ── Main Handler ──────────────────────────────────────────────────
 
 function handlePage() {
+  if (window.location.hostname === 'music.youtube.com') return;
+
   const path = window.location.pathname;
   const currentUrl = window.location.href;
 
@@ -179,10 +236,13 @@ function handlePage() {
   filterVideoCards();
 }
 
-// ── Observer & Events ──────────────────────────────────────────────
+// ── Observer & Events ─────────────────────────────────────────────
 
 function setupObserver() {
-  new MutationObserver(() => handlePage()).observe(document.documentElement, {
+  new MutationObserver(() => {
+    if (window.location.hostname === 'music.youtube.com') return;
+    handlePage();
+  }).observe(document.documentElement, {
     childList: true, subtree: true,
   });
 }

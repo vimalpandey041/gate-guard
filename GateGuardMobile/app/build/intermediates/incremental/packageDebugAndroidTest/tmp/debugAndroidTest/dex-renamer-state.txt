@@ -1,0 +1,4 @@
+#Thu Sep 17 13:11:29 IST 2026
+base.0=/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/dex/debugAndroidTest/mergeProjectDexDebugAndroidTest/0/classes.dex
+path.0=0/classes.dex
+renamed.0=classes.dex

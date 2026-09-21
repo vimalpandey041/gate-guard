@@ -1,0 +1,154 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.gateguard.dnslock"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="35" />
+10
+11    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+11-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:5:5-81
+11-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:5:22-78
+12    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+12-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:6:5-77
+12-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:6:22-74
+13    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+13-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:7:5-89
+13-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:7:22-86
+14    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+14-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:8:5-77
+14-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:8:22-74
+15    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+15-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:9:5-10:47
+15-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:9:22-70
+16    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+16-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:11:5-12:47
+16-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:11:22-77
+17
+18    <application
+18-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:14:5-80:19
+19        android:allowBackup="false"
+19-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:15:9-36
+20        android:debuggable="true"
+21        android:extractNativeLibs="false"
+22        android:icon="@drawable/ic_shield"
+22-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:16:9-43
+23        android:label="System DNS"
+23-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:17:9-35
+24        android:supportsRtl="true"
+24-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:18:9-35
+25        android:theme="@android:style/Theme.NoDisplay" >
+25-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:19:9-55
+26
+27        <!-- Hidden launcher - app won't show in app drawer -->
+28        <activity
+28-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:22:9-30:20
+29            android:name="com.gateguard.dnslock.SetupActivity"
+29-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:23:13-42
+30            android:exported="true"
+30-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:24:13-36
+31            android:theme="@android:style/Theme.NoDisplay" >
+31-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:25:13-59
+32            <intent-filter>
+32-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:26:13-29:29
+33                <action android:name="android.intent.action.MAIN" />
+33-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:27:17-69
+33-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:27:25-66
+34
+35                <category android:name="android.intent.category.LAUNCHER" />
+35-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:28:17-77
+35-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:28:27-74
+36            </intent-filter>
+37        </activity>
+38
+39        <!-- Device Admin Receiver - prevents uninstallation -->
+40        <receiver
+40-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:33:9-43:20
+41            android:name="com.gateguard.dnslock.GateDeviceAdmin"
+41-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:34:13-44
+42            android:exported="true"
+42-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:35:13-36
+43            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+43-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:36:13-70
+44            <meta-data
+44-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:37:13-39:65
+45                android:name="android.app.device_admin"
+45-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:38:17-56
+46                android:resource="@xml/device_admin_policies" />
+46-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:39:17-62
+47
+48            <intent-filter>
+48-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:40:13-42:29
+49                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+49-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:41:17-82
+49-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:41:25-79
+50            </intent-filter>
+51        </receiver>
+52
+53        <!-- DNS Lock Service - runs forever in background -->
+54        <service
+54-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:46:9-54:19
+55            android:name="com.gateguard.dnslock.DNSLockService"
+55-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:47:13-43
+56            android:enabled="true"
+56-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:48:13-35
+57            android:exported="false"
+57-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:49:13-37
+58            android:foregroundServiceType="specialUse" >
+58-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:50:13-55
+59            <property
+59-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:51:13-53:72
+60                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+60-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:52:17-76
+61                android:value="DNS enforcement for parental control" />
+61-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:53:17-69
+62        </service>
+63
+64        <!-- Boot Receiver - starts service on phone restart -->
+65        <receiver
+65-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:57:9-65:20
+66            android:name="com.gateguard.dnslock.BootReceiver"
+66-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:58:13-41
+67            android:enabled="true"
+67-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:60:13-35
+68            android:exported="true" >
+68-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:59:13-36
+69            <intent-filter>
+69-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:61:13-64:29
+70                <action android:name="android.intent.action.BOOT_COMPLETED" />
+70-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:62:17-79
+70-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:62:25-76
+71                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+71-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:63:17-84
+71-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:63:25-81
+72            </intent-filter>
+73        </receiver>
+74
+75        <!-- Accessibility Service - UNKILLABLE DNS Guardian -->
+76        <service
+76-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:68:9-78:19
+77            android:name="com.gateguard.dnslock.DNSAccessibilityService"
+77-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:69:13-52
+78            android:exported="true"
+78-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:70:13-36
+79            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+79-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:71:13-79
+80            <intent-filter>
+80-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:72:13-74:29
+81                <action android:name="android.accessibilityservice.AccessibilityService" />
+81-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:73:17-92
+81-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:73:25-89
+82            </intent-filter>
+83
+84            <meta-data
+84-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:75:13-77:64
+85                android:name="android.accessibilityservice"
+85-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:76:17-60
+86                android:resource="@xml/accessibility_config" />
+86-->/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/AndroidManifest.xml:77:17-61
+87        </service>
+88    </application>
+89
+90</manifest>

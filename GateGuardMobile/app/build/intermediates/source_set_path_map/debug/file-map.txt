@@ -1,0 +1,7 @@
+com.gateguard.dnslock.app-pngs-0 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/generated/res/pngs/debug
+com.gateguard.dnslock.app-resValues-1 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/generated/res/resValues/debug
+com.gateguard.dnslock.app-packageDebugResources-2 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.gateguard.dnslock.app-packageDebugResources-3 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.gateguard.dnslock.app-merged_res-4 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/build/intermediates/merged_res/debug
+com.gateguard.dnslock.app-debug-5 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/debug/res
+com.gateguard.dnslock.app-main-6 /Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/res
