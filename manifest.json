@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "GATE Guard — YouTube Focus Mode",
-  "version": "2.0",
+  "name": "GATE Guard \u2014 YouTube Focus Mode",
+  "version": "2.3",
   "description": "Stay focused on GATE prep. Blocks distracting YouTube content, allows only your approved GATE channels & YouTube Music.",
   "permissions": [
     "webNavigation",
@@ -21,8 +21,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/*"],
-      "js": ["content.js"],
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
       "run_at": "document_start"
     }
   ],
@@ -33,8 +37,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "blocked.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }

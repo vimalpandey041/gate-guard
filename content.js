@@ -12,7 +12,8 @@ const HARDCODED_CHANNELS = [
   "Gatecsit-dsai",
   "UnacademyComputerScience",
   "GfG_GATE",
-  "AmitKhuranaSir"
+  "AmitKhuranaSir",
+  "DreamMaths"
 ];
 
 let lastUrl = '';
