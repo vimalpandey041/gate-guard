@@ -1,74 +1,85 @@
 /**
- * GATE Guard v2.0 — LOCKED DOWN Background Service Worker
+ * GATE Guard v3.0 — DYNAMIC CONFIG via MongoDB API
  *
  * MILITARY MODE:
- * - Extension is ALWAYS ON (no toggle)
- * - chrome://extensions is BLOCKED (prevents uninstall/disable)
- * - Blocked sites cannot be removed, only added
- * - Allowed YouTube channels are HARDCODED and cannot be changed
- * - Other blocked sites are fully blocked with redirect
- * - YouTube is filtered by content script
+ * - Extension is ALWAYS ON
+ * - chrome://extensions is BLOCKED
+ * - Config is fetched dynamically from API every 30 minutes
  */
 
+const API_URL = "https://gateguard.vimalpandey.in/api/config"; // EC2 IP will go here
+
 const DEFAULT_BLOCKED_SITES = [
-  "youtube.com",
-  "reddit.com",
-  "x.com",
-  "twitter.com",
-  "instagram.com",
-  "cricbuzz.com",
-  "jiohotstar.com",
-  "hotstar.com",
-  "amazon.in",
-  "amazon.com",
-  "nextdns.io"
+  "youtube.com", "reddit.com", "x.com", "twitter.com",
+  "instagram.com", "cricbuzz.com", "jiohotstar.com",
+  "hotstar.com", "nextdns.io"
 ];
 
-const HARDCODED_ALLOWED_CHANNELS = [
-  "pw-solutions",
-  "GOClassesforGATECS",
-  "GATEWallahbyPW",
-  "gatewallah_cse_da",
-  "Gatecsit-dsai",
-  "UnacademyComputerScience",
-  "GfG_GATE"
+const DEFAULT_CHANNELS = [
+  "pw-solutions", "GOClassesforGATECS", "GATEWallahbyPW",
+  "gatewallah_cse_da", "Gatecsit-dsai", "UnacademyComputerScience",
+  "GfG_GATE", "AmitKhuranaSir", "DreamMaths"
 ];
 
 let blockedSites = [];
+let blockedMessage = "Blocked by GATE Guard";
+
+// ── Fetch Config from API ──────────────────────────────────────────
+
+async function fetchConfig() {
+  try {
+    const res = await fetch(API_URL);
+    if (!res.ok) throw new Error("API not ok");
+    const data = await res.json();
+    
+    // Cache in local storage
+    chrome.storage.local.set({
+      allowedChannels: data.allowedChannels || DEFAULT_CHANNELS,
+      blockedSites: data.blockedSites || DEFAULT_BLOCKED_SITES,
+      blockedMessage: data.blockedMessage || "Blocked by GATE Guard",
+      lastFetch: Date.now()
+    });
+    console.log("✅ Config fetched and cached from API", data);
+  } catch (err) {
+    console.error("❌ API fetch failed, using cache/defaults", err);
+  }
+}
 
 // ── Initialize ─────────────────────────────────────────────────────
 
 function initFromStorage() {
-  chrome.storage.local.get(['blockedSites'], (result) => {
-    if (result.blockedSites === undefined) {
-      blockedSites = [...DEFAULT_BLOCKED_SITES];
+  chrome.storage.local.get(['blockedSites', 'blockedMessage', 'allowedChannels'], (result) => {
+    blockedSites = result.blockedSites || DEFAULT_BLOCKED_SITES;
+    blockedMessage = result.blockedMessage || "Blocked by GATE Guard";
+    
+    // Seed initial defaults if completely empty
+    if (!result.blockedSites) {
       chrome.storage.local.set({
-        blockedSites,
-        allowedChannels: HARDCODED_ALLOWED_CHANNELS
+        blockedSites: DEFAULT_BLOCKED_SITES,
+        allowedChannels: DEFAULT_CHANNELS,
+        blockedMessage: "Blocked by GATE Guard"
       });
-    } else {
-      blockedSites = result.blockedSites;
-      // Always overwrite allowed channels with hardcoded list (can't be changed)
-      chrome.storage.local.set({ allowedChannels: HARDCODED_ALLOWED_CHANNELS });
     }
-    console.log("GATE Guard v2.0 LOCKED. Blocked sites:", blockedSites);
   });
 }
 
 initFromStorage();
+fetchConfig();
+
+// Fetch every 30 minutes
+chrome.alarms.create("fetchConfig", { periodInMinutes: 30 });
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === "fetchConfig") fetchConfig();
+});
+
+// Refresh on startup or install
+chrome.runtime.onStartup.addListener(fetchConfig);
+chrome.runtime.onInstalled.addListener(fetchConfig);
 
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace !== 'local') return;
   if (changes.blockedSites) blockedSites = changes.blockedSites.newValue;
-  
-  // SECURITY: Force allowed channels back to hardcoded if someone tries to change them
-  if (changes.allowedChannels) {
-    const newVal = changes.allowedChannels.newValue;
-    const isValid = JSON.stringify(newVal.sort()) === JSON.stringify([...HARDCODED_ALLOWED_CHANNELS].sort());
-    if (!isValid) {
-      chrome.storage.local.set({ allowedChannels: HARDCODED_ALLOWED_CHANNELS });
-    }
-  }
+  if (changes.blockedMessage) blockedMessage = changes.blockedMessage.newValue;
 });
 
 // ── MILITARY SECURITY: Block chrome://extensions & settings ────────
@@ -77,7 +88,6 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.url) {
     const url = changeInfo.url.toLowerCase();
     
-    // Check if user is trying to access extension management or settings
     if (url.startsWith('chrome://extensions') || 
         url.startsWith('chrome://settings') ||
         url.startsWith('edge://extensions') ||
@@ -85,14 +95,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         url.startsWith('brave://extensions') ||
         url.startsWith('brave://settings')) {
       
-      // Redirect to our blocked page
       const blockedUrl = chrome.runtime.getURL(`blocked.html?site=chrome-settings`);
       chrome.tabs.update(tabId, { url: blockedUrl });
     }
   }
 });
 
-// Also catch when new tabs are created directly to chrome://extensions
 chrome.tabs.onCreated.addListener((tab) => {
   const url = (tab.pendingUrl || tab.url || '').toLowerCase();
   if (url.startsWith('chrome://extensions') ||
@@ -120,13 +128,11 @@ function getBlockedDomain(url) {
   // YouTube handled by content script
   if (hostname === 'youtube.com' || hostname === 'www.youtube.com' || hostname === 'm.youtube.com') return null;
 
-  // Check blocked sites
   for (const site of blockedSites) {
     const domain = site.toLowerCase();
     if (domain === 'youtube.com') continue;
     if (hostname === domain || hostname.endsWith('.' + domain)) return site;
   }
-
   return null;
 }
 

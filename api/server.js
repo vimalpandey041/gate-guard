@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const path = require("path");
 const app = express();
+app.use(express.static(path.join(__dirname, "public")));
 app.use(cors());
 app.use(express.json());
 
@@ -31,7 +33,7 @@ const DEFAULT_CHANNELS = [
 const DEFAULT_BLOCKED = [
   "reddit.com","x.com","twitter.com","instagram.com",
   "cricbuzz.com","jiohotstar.com","hotstar.com",
-  "amazon.in","amazon.com","nextdns.io"
+  "nextdns.io"
 ];
 
 // ── Seed DB ─────────────────────────────────────────────────────

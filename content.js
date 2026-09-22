@@ -4,7 +4,7 @@
  * DevTools proof. No video killing. SPA-safe.
  */
 
-const HARDCODED_CHANNELS = [
+let allowedChannels = [
   "pw-solutions",
   "GOClassesforGATECS",
   "GATEWallahbyPW",
@@ -15,6 +15,18 @@ const HARDCODED_CHANNELS = [
   "AmitKhuranaSir",
   "DreamMaths"
 ];
+
+// Fetch dynamically from storage
+chrome.storage.local.get(['allowedChannels'], (res) => {
+  if (res.allowedChannels) allowedChannels = res.allowedChannels;
+});
+chrome.storage.onChanged.addListener((changes, namespace) => {
+  if (namespace === 'local' && changes.allowedChannels) {
+    allowedChannels = changes.allowedChannels.newValue;
+    handlePage(); // re-filter immediately
+  }
+});
+
 
 let lastUrl = '';
 let watchCheckTimer = null;
@@ -44,7 +56,7 @@ injectCSS();
 
 function isChannelAllowed(handle) {
   if (!handle) return false;
-  return HARDCODED_CHANNELS.some(ch => ch.toLowerCase() === handle.toLowerCase());
+  return allowedChannels.some(ch => ch.toLowerCase() === handle.toLowerCase());
 }
 
 // ── Block Overlay ─────────────────────────────────────────────────
@@ -108,23 +120,57 @@ function extractHandleFromCard(card) {
 }
 
 function getWatchPageChannel() {
+  // 1. Try to get from meta tags (instant)
+  const authorNameLink = document.querySelector('span[itemprop="author"] link[itemprop="name"]');
+  if (authorNameLink) {
+    const name = authorNameLink.getAttribute('content');
+    if (name) return name.trim().replace(/\s+/g, '');
+  }
+
+  const authorUrlLink = document.querySelector('span[itemprop="author"] link[itemprop="url"]');
+  if (authorUrlLink) {
+    const href = authorUrlLink.getAttribute('href') || '';
+    const match = href.match(/\/@([^\/?#]+)/);
+    if (match) return match[1];
+    const matchFallback = href.match(/\/(channel|c|user)\/([^\/?#]+)/);
+    if (matchFallback) return matchFallback[2];
+  }
+
+  // 2. Try to get from DOM elements
   const selectors = [
-    'ytd-video-owner-renderer a.yt-simple-endpoint[href*="/@"]',
-    '#owner a[href*="/@"]',
-    '#channel-name a[href*="/@"]',
-    'a.ytd-channel-name[href*="/@"]',
-    '#top-row ytd-channel-name a[href*="/@"]',
-    'ytd-watch-metadata a[href*="/@"]',
-    'span[itemprop="author"] link[itemprop="url"]',
+    'ytd-video-owner-renderer a.yt-simple-endpoint',
+    '#owner a.yt-simple-endpoint',
+    'ytd-channel-name a.yt-simple-endpoint'
   ];
   for (const sel of selectors) {
     const el = document.querySelector(sel);
     if (el) {
-      const href = el.getAttribute('href');
+      const href = el.getAttribute('href') || el.getAttribute('content') || '';
       const match = href.match(/\/@([^\/?#]+)/);
       if (match) return match[1];
+      const matchFallback = href.match(/\/(channel|c|user)\/([^\/?#]+)/);
+      if (matchFallback) return matchFallback[2];
     }
   }
+
+  // 3. Fallback: text content
+  const textEl = document.querySelector('ytd-video-owner-renderer ytd-channel-name yt-formatted-string, #owner ytd-channel-name yt-formatted-string, #channel-name .yt-formatted-string');
+  if (textEl && textEl.innerText) {
+    return textEl.innerText.trim().replace(/\s+/g, '');
+  }
+
+  // 4. Page title fallback
+  const title = document.title;
+  if (title && title.includes(' - ')) {
+    const parts = title.split(' - ');
+    if (parts.length >= 2) {
+      const possibleChannel = parts[parts.length - 2];
+      if (possibleChannel !== 'YouTube') {
+         return possibleChannel.trim().replace(/\s+/g, '');
+      }
+    }
+  }
+
   return null;
 }
 

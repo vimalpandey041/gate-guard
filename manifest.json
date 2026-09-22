@@ -1,12 +1,13 @@
 {
   "manifest_version": 3,
   "name": "GATE Guard \u2014 YouTube Focus Mode",
-  "version": "2.3",
+  "version": "3.0",
   "description": "Stay focused on GATE prep. Blocks distracting YouTube content, allows only your approved GATE channels & YouTube Music.",
   "permissions": [
     "webNavigation",
     "storage",
-    "tabs"
+    "tabs",
+    "alarms"
   ],
   "action": {
     "default_popup": "popup.html",
@@ -44,5 +45,8 @@
         "<all_urls>"
       ]
     }
+  ],
+  "host_permissions": [
+    "https://gateguard.vimalpandey.in/*"
   ]
 }
