@@ -62,7 +62,11 @@ function isChannelAllowed(handle) {
 // ── Block Overlay ─────────────────────────────────────────────────
 
 function showBlockOverlay(message) {
-  if (overlayEl && document.contains(overlayEl)) return;
+  if (overlayEl && document.contains(overlayEl)) {
+    const msgEl = overlayEl.querySelector('.gate-guard-msg');
+    if (msgEl) msgEl.innerHTML = message;
+    return;
+  }
   isCurrentPageBlocked = true;
   overlayEl = document.createElement('div');
   overlayEl.id = 'gate-guard-block';
@@ -78,7 +82,7 @@ function showBlockOverlay(message) {
       <svg width="36" height="36" viewBox="0 0 24 24" fill="white"><path d="M12 2L3 7v5c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5zm-1 14.59l-3.29-3.3 1.41-1.41L11 13.77l4.88-4.88 1.41 1.41L11 16.59z"/></svg>
     </div>
     <div style="font-size:1.5rem;font-weight:800;margin-bottom:8px;background:linear-gradient(135deg,#f87171,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Blocked by GATE Guard</div>
-    <div style="color:#a1a1aa;font-size:0.95rem;margin-bottom:24px;">${message}</div>
+    <div class="gate-guard-msg" style="color:#a1a1aa;font-size:0.95rem;margin-bottom:24px;"></div>
     <a href="https://www.youtube.com/" style="padding:10px 20px;background:rgba(139,92,246,0.15);border:1px solid rgba(139,92,246,0.3);border-radius:10px;color:#a78bfa;text-decoration:none;font-size:0.85rem;font-weight:600;">Go to Home</a>
   `;
   (document.documentElement || document.body).appendChild(overlayEl);
@@ -198,56 +202,23 @@ function filterVideoCards() {
 
 // ── Watch Page Check (SPA-safe) ───────────────────────────────────
 
+let allowedCount = 0;
 function checkWatchPage() {
-  if (watchCheckTimer) { clearInterval(watchCheckTimer); watchCheckTimer = null; }
-  
-  const expectedUrl = window.location.href;
-  showBlockOverlay('Verifying channel...');
-
-  // Wait 1.5s for SPA DOM to update, then start checking
-  setTimeout(() => {
-    let attempts = 0;
-    let allowedCount = 0;
-
-    watchCheckTimer = setInterval(() => {
-      // If URL changed, abort
-      if (window.location.href !== expectedUrl) {
-        clearInterval(watchCheckTimer);
-        watchCheckTimer = null;
-        return;
-      }
-
-      attempts++;
-      const handle = getWatchPageChannel();
-
-      if (handle !== null) {
-        if (isChannelAllowed(handle)) {
-          allowedCount++;
-          if (allowedCount >= 2) {
-            removeBlockOverlay();
-            clearInterval(watchCheckTimer);
-            watchCheckTimer = null;
-          }
-        } else {
-          allowedCount = 0;
-          clearInterval(watchCheckTimer);
-          watchCheckTimer = null;
-          removeBlockOverlay();
-          showBlockOverlay('This video is not from an allowed GATE channel');
-          return;
-        }
-      }
-
-      if (attempts >= 10) {
-        clearInterval(watchCheckTimer);
-        watchCheckTimer = null;
-        if (allowedCount < 2) {
-          removeBlockOverlay();
-          showBlockOverlay('Could not verify channel — blocked for safety');
-        }
-      }
-    }, 500);
-  }, 1500);
+  const channel = getWatchPageChannel();
+  if (channel) {
+    if (isChannelAllowed(channel)) {
+      removeBlockOverlay();
+    } else {
+      showBlockOverlay('Blocked by GATE Guard<br><span style="font-size:16px;color:#888;">Channel <b>' + channel + '</b> is not in allowed list</span>');
+    }
+  } else {
+    allowedCount++;
+    if (allowedCount < 20) {
+      setTimeout(checkWatchPage, 500);
+    } else {
+      showBlockOverlay('Blocked by GATE Guard<br><span style="font-size:16px;color:#888;">Could not verify channel — blocked for safety</span>');
+    }
+  }
 }
 
 // ── Main Handler ──────────────────────────────────────────────────
@@ -276,6 +247,8 @@ function handlePage() {
     }
 
     if (path.startsWith('/watch')) {
+      allowedCount = 0;
+      showBlockOverlay('Verifying channel...');
       checkWatchPage();
     }
   }
