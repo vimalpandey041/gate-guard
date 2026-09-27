@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "GATE Guard \u2014 YouTube Focus Mode",
-  "version": "3.0",
+  "version": "3.1",
   "description": "Stay focused on GATE prep. Blocks distracting YouTube content, allows only your approved GATE channels & YouTube Music.",
   "permissions": [
     "webNavigation",
