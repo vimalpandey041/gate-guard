@@ -8,14 +8,14 @@ echo "  No terminal command, no AI chat can undo this."
 echo ""
 
 # ═══════════════════════════════════════════════════════
-# LAYER 1: DNS ENFORCER (every 3 seconds)
+# LAYER 1: NEXTDNS ENFORCER (every 3 seconds)
 # ═══════════════════════════════════════════════════════
 cat > /Library/Application\ Support/gateguard_dns.sh << 'DNS'
 #!/bin/bash
 while true; do
   current=$(networksetup -getdnsservers Wi-Fi 2>/dev/null)
-  if [[ "$current" != *"185.228.168.168"* ]]; then
-    networksetup -setdnsservers Wi-Fi 185.228.168.168 185.228.169.168
+  if [[ "$current" != *"45.90.28.143"* ]]; then
+    networksetup -setdnsservers Wi-Fi 45.90.28.143 45.90.30.143 2a07:a8c0::5f:4eb9 2a07:a8c1::5f:4eb9
     dscacheutil -flushcache
     killall -HUP mDNSResponder 2>/dev/null
   fi
@@ -49,6 +49,8 @@ while true; do
     "chrome://flags" "chrome://flags/*" \
     "chrome://downloads" "chrome://downloads/*" \
     "chrome://history" "chrome://history/*"
+  defaults write com.google.Chrome ExtensionInstallForcelist -array \
+    "elhfcfelcnpeeelpbbcjbbajnfhakjcj;https://clients2.google.com/service/update2/crx"
   sleep 5
 done
 CHROME
@@ -81,6 +83,12 @@ while true; do
   killall -9 "Microsoft Edge" 2>/dev/null
   killall -9 "Opera" 2>/dev/null
   # Kill System Settings (prevents DNS change)
+  # Kill AI/Dev tools (no cheating via AI)
+  killall -9 "Antigravity IDE" 2>/dev/null
+  killall -9 "Antigravity IDE Helper" 2>/dev/null
+  killall -9 "studio" 2>/dev/null
+  pkill -9 -f "Android Studio" 2>/dev/null
+  pkill -9 -f "Antigravity" 2>/dev/null
   killall -9 "System Settings" 2>/dev/null
   killall -9 "System Preferences" 2>/dev/null
   sleep 2

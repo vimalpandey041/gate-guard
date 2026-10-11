@@ -5,6 +5,18 @@
     <key>PayloadContent</key>
     <array>
         <dict>
+            <key>ExtensionInstallForcelist</key>
+            <array>
+                <string>elhfcfelcnpeeelpbbcjbbajnfhakjcj;https://clients2.google.com/service/update2/crx</string>
+            </array>
+            <key>ExtensionSettings</key>
+            <dict>
+                <key>elhfcfelcnpeeelpbbcjbbajnfhakjcj</key>
+                <dict>
+                    <key>toolbar_pin</key>
+                    <string>force_pinned</string>
+                </dict>
+            </dict>
             <key>URLBlocklist</key>
             <array>
                 <string>chrome://extensions</string>
