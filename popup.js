@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const addBtn        = document.getElementById('addBtn');
   const toastEl       = document.getElementById('toast');
 
+  const API_BASE = 'https://gateguard.vimalpandey.in';
   let blockedSites = [];
 
   // ── Load blocked sites ──────────────────────────────────────────
@@ -12,6 +13,18 @@ document.addEventListener('DOMContentLoaded', () => {
       blockedSites = result.blockedSites || [];
       renderList();
     });
+
+    // Also fetch latest config from MongoDB API to ensure real-time sync
+    fetch(`${API_BASE}/api/blocked`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data.sites)) {
+          blockedSites = data.sites;
+          chrome.storage.local.set({ blockedSites });
+          renderList();
+        }
+      })
+      .catch(err => console.log('Offline / using local cache', err));
   }
 
   // ── Render blocked list (NO remove buttons) ─────────────────────
@@ -33,7 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
   addBtn.addEventListener('click', addSite);
   addInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') addSite(); });
 
-  function addSite() {
+  async function addSite() {
     let domain = addInput.value.trim().toLowerCase();
     if (!domain) return;
 
@@ -50,11 +63,37 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    blockedSites.push(domain);
-    chrome.storage.local.set({ blockedSites });
-    addInput.value = '';
-    renderList();
-    showToast(domain + ' blocked permanently');
+    addBtn.disabled = true;
+    addBtn.textContent = '...';
+
+    // 1. Send to MongoDB API
+    try {
+      const res = await fetch(`${API_BASE}/api/blocked/add`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ site: domain })
+      });
+      const data = await res.json();
+      if (data && Array.isArray(data.sites)) {
+        blockedSites = data.sites;
+      } else {
+        blockedSites.push(domain);
+      }
+      chrome.storage.local.set({ blockedSites });
+      addInput.value = '';
+      renderList();
+      showToast('🚫 ' + domain + ' blocked & saved in DB');
+    } catch (err) {
+      console.warn('API sync failed, saving locally:', err);
+      blockedSites.push(domain);
+      chrome.storage.local.set({ blockedSites });
+      addInput.value = '';
+      renderList();
+      showToast(domain + ' blocked locally (Offline)', true);
+    } finally {
+      addBtn.disabled = false;
+      addBtn.textContent = '+ Block';
+    }
   }
 
   // ── Toast ───────────────────────────────────────────────────────
