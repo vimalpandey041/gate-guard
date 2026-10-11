@@ -1,27 +1,47 @@
 #!/bin/bash
 # ═══════════════════════════════════════════════════════
-# GATE Guard — RECOVERY UNLOCK SCRIPT
-# Run this in macOS Recovery Terminal or with sudo:
+# GATE Guard — RECOVERY ONLY UNLOCK SCRIPT
+# This script is strictly hardcoded to FAIL in normal boot.
+# It ONLY works inside macOS Recovery Mode Terminal.
 # ═══════════════════════════════════════════════════════
-echo "Unlocking GATE Guard Nuclear Lock..."
 
-chflags noschg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
-chflags noschg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
-chflags nouchg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
-chflags nouchg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
+VOL_NAME=$(diskutil info / 2>/dev/null | grep "Volume Name:" | awk -F: '{print $2}' | xargs)
 
-launchctl unload -w /Library/LaunchDaemons/com.gateguard.watchdog.plist 2>/dev/null || true
-launchctl unload -w /Library/LaunchDaemons/com.gateguard.appkiller.plist 2>/dev/null || true
-launchctl unload -w /Library/LaunchDaemons/com.gateguard.dns.plist 2>/dev/null || true
-launchctl unload -w /Library/LaunchDaemons/com.gateguard.chrome.plist 2>/dev/null || true
+if [ "$VOL_NAME" != "macOS Base System" ]; then
+    echo ""
+    echo "  ⛔ ACCESS DENIED: Nuclear Lock is Active!"
+    echo "  ═════════════════════════════════════════"
+    echo "  Yeh script Normal macOS Boot mein CHALNA SAKHT MANA HAI."
+    echo "  Normal boot mein tum ise chala kar lock bypass nahi kar sakte!"
+    echo ""
+    echo "  🔒 Asli Unlock sirf 6 Feb ko Recovery Mode se hoga:"
+    echo "     1. Mac ko Shut Down karo."
+    echo "     2. Power Button hold karke Options ➔ Recovery Mode mein jao."
+    echo "     3. Top menu: Utilities ➔ Terminal kholo."
+    echo "     4. Wahan command chalao:"
+    echo "        bash \"/Volumes/Vimal Pandey/Volumes/Development/gate/RECOVERY_UNLOCK.sh\""
+    echo ""
+    exit 1
+fi
 
-pkill -9 -f "gateguard" 2>/dev/null || true
+echo ""
+echo "  ✅ macOS Recovery Mode Detected!"
+echo "  Unlocking GATE Guard Nuclear Lock..."
 
-rm -f /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
-rm -f /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
+TARGET_DIR="/Volumes/Vimal Pandey"
+if [ ! -d "$TARGET_DIR" ]; then
+    TARGET_DIR=$(ls -d /Volumes/* 2>/dev/null | grep -v "macOS Base System" | head -n 1)
+fi
 
-defaults delete com.google.Chrome URLBlocklist 2>/dev/null || true
-defaults delete com.google.Chrome ExtensionInstallForcelist 2>/dev/null || true
-killall -9 cfprefsd 2>/dev/null || true
+echo "  Target Disk: $TARGET_DIR"
 
-echo "✅ All locks removed successfully!"
+chflags noschg "$TARGET_DIR/Library/LaunchDaemons"/com.gateguard.*.plist 2>/dev/null || true
+chflags noschg "$TARGET_DIR/Library/Application Support"/gateguard_*.sh 2>/dev/null || true
+chflags nouchg "$TARGET_DIR/Library/LaunchDaemons"/com.gateguard.*.plist 2>/dev/null || true
+chflags nouchg "$TARGET_DIR/Library/Application Support"/gateguard_*.sh 2>/dev/null || true
+
+rm -f "$TARGET_DIR/Library/LaunchDaemons"/com.gateguard.*.plist 2>/dev/null || true
+rm -f "$TARGET_DIR/Library/Application Support"/gateguard_*.sh 2>/dev/null || true
+
+echo "  ✅ All Nuclear Lock files deleted from Recovery Mode!"
+echo "  Mac ko restart kar do (reboot)."

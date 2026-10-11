@@ -185,6 +185,7 @@ chflags schg /Library/Application\ Support/gateguard_dns.sh
 chflags schg /Library/Application\ Support/gateguard_chrome.sh
 chflags schg /Library/Application\ Support/gateguard_appkiller.sh
 chflags schg /Library/Application\ Support/gateguard_watchdog.sh
+chflags schg /Volumes/Development/gate/RECOVERY_UNLOCK.sh
 
 echo ""
 echo "  ✅ ALL 4 LAYERS ACTIVE:"
