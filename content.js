@@ -79,6 +79,40 @@ function injectCSS() {
       display: none !important;
     }
 
+        /* Hide Comments completely */
+    #comments,
+    ytd-comments,
+    #comment-teaser,
+    ytd-item-section-renderer[section-identifier="comment-item-section"],
+    ytd-engagement-panel-section-list-renderer[target-id="engagement-panel-comments-section"],
+    ytd-engagement-panel-section-list-renderer[target-id="comments"] {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
+    /* Hide Live Chat, Chat Replay & Chat Teaser Panels */
+    #chat,
+    #chat-container,
+    #chatframe,
+    ytd-live-chat-frame,
+    iframe#chatframe,
+    #chat-messages,
+    ytd-item-section-renderer:has(#chat),
+    ytd-item-section-renderer:has(ytd-live-chat-frame),
+    ytd-item-section-renderer:has(iframe#chatframe),
+    ytd-engagement-panel-section-list-renderer[target-id*="chat"],
+    ytd-engagement-panel-section-list-renderer[target-id*="Chat"],
+    ytd-engagement-panel-section-list-renderer[target-id*="live-chat"],
+    [target-id*="chat"],
+    [target-id*="Chat"],
+    ytd-button-renderer:has(button[aria-label*="chat" i]),
+    ytd-button-renderer:has(button[aria-label*="Chat" i]) {
+      display: none !important;
+      visibility: hidden !important;
+      pointer-events: none !important;
+    }
+
     /* Hide Miniplayer */
     .ytp-miniplayer-button,
     button[aria-label="Miniplayer"],
@@ -255,6 +289,30 @@ function checkWatchPage() {
   }
 }
 
+
+function removeDistractions() {
+  // Hide comments
+  const comments = document.querySelector("#comments, ytd-comments");
+  if (comments) comments.style.setProperty("display", "none", "important");
+
+  // Hide live chat
+  const chat = document.querySelector("#chat, #chat-container, ytd-live-chat-frame, iframe#chatframe");
+  if (chat) chat.style.setProperty("display", "none", "important");
+
+  // Hide chat teaser / panels
+  document.querySelectorAll("ytd-engagement-panel-section-list-renderer[target-id*=\"chat\"], ytd-engagement-panel-section-list-renderer[target-id*=\"Chat\"], [target-id*=\"live-chat\"]").forEach(el => {
+    el.style.setProperty("display", "none", "important");
+  });
+
+  // Find any teaser card that contains Live chat text
+  document.querySelectorAll("ytd-item-section-renderer, ytd-engagement-panel-section-list-renderer").forEach(el => {
+    const text = el.innerText || "";
+    if ((text.includes("Live chat replay") || text.includes("Top chat replay") || text.includes("Live chat")) && !el.querySelector("ytd-watch-metadata")) {
+      el.style.setProperty("display", "none", "important");
+    }
+  });
+}
+
 // ── Main Page Handler ─────────────────────────────────────────────
 
 function handlePage() {
@@ -264,6 +322,7 @@ function handlePage() {
   const currentUrl = window.location.href;
 
   injectCSS();
+  removeDistractions();
 
   // 1. LAYER 1: STRICT NON-VIDEO BLOCKING (Dashboard, Search, Feeds)
   if (!isDirectVideoPath(path)) {
@@ -327,6 +386,7 @@ function setupObserver() {
   new MutationObserver(() => {
     if (window.location.hostname === "music.youtube.com") return;
     injectCSS();
+    removeDistractions();
     const path = window.location.pathname;
     if (!isDirectVideoPath(path) && !isCurrentPageBlocked) {
       handlePage();
