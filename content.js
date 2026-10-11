@@ -1,10 +1,10 @@
 /**
- * GATE Guard v3.2 — Content Script — DIRECT LINK ONLY MODE
+ * GATE Guard v3.2 — Content Script — DIRECT LINK & APPROVED CHANNEL GATE
  * - YouTube Home / Dashboard is 100% BLOCKED.
  * - YouTube Search (/results) is 100% BLOCKED.
- * - Search bar and related videos are hidden.
- * - ONLY direct video links (/watch, /playlist, /embed, /live) are allowed.
- * - Allowed GATE channels are verified on watch pages.
+ * - Non-approved channels are 100% BLOCKED.
+ * - Search bar, comments, live chat, and related videos are hidden.
+ * - ONLY direct video links of approved GATE channels can play.
  * - DevTools proof overlay guard. SPA-safe.
  */
 
@@ -19,17 +19,30 @@ let allowedChannels = [
   "UnacademyComputerScience",
   "GfG_GATE",
   "AmitKhuranaSir",
-  "DreamMaths"
+  "DreamMaths",
+  "KNOWLEDGEGATE_kg",
+  "Knowledge Gate",
+  "GateSmashers",
+  "Gate Smashers",
+  "GATEWallah",
+  "GATE Wallah",
+  "UnacademyGATECSIT&DA",
+  "Unacademy GATE CS IT & DA"
 ];
 
 // Fetch dynamically from storage
 chrome.storage.local.get(["allowedChannels"], (res) => {
-  if (res.allowedChannels) allowedChannels = res.allowedChannels;
+  if (res.allowedChannels && Array.isArray(res.allowedChannels) && res.allowedChannels.length > 0) {
+    allowedChannels = res.allowedChannels;
+  }
 });
+
 chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === "local" && changes.allowedChannels) {
-    allowedChannels = changes.allowedChannels.newValue;
-    handlePage(); // re-filter immediately
+    if (Array.isArray(changes.allowedChannels.newValue) && changes.allowedChannels.newValue.length > 0) {
+      allowedChannels = changes.allowedChannels.newValue;
+      handlePage();
+    }
   }
 });
 
@@ -39,7 +52,7 @@ let isCurrentPageBlocked = false;
 let guardInterval = null;
 let currentBlockMessage = "";
 
-// ── Strict CSS Injection: Hide Search, Recommendations & Miniplayer ─
+// ── Strict CSS Injection ──────────────────────────────────────────
 
 function injectCSS() {
   if (document.getElementById("gate-guard-css")) return;
@@ -81,7 +94,7 @@ function injectCSS() {
       display: none !important;
     }
 
-        /* Hide Comments completely */
+    /* Hide Comments completely */
     #comments,
     ytd-comments,
     #comment-teaser,
@@ -93,7 +106,7 @@ function injectCSS() {
       pointer-events: none !important;
     }
 
-    /* Hide Live Chat, Chat Replay & Chat Teaser Panels */
+    /* Hide Live Chat & Chat Replay */
     #chat,
     #chat-container,
     #chatframe,
@@ -141,11 +154,7 @@ function isChannelAllowed(identifier) {
   return allowedChannels.some(ch => {
     if (!ch) return false;
     const chNorm = normalizeChannel(ch);
-    return (
-      ch.toLowerCase() === identifier.toLowerCase() ||
-      chNorm === norm ||
-      (chNorm.length > 5 && norm.length > 5 && (chNorm.includes(norm) || norm.includes(chNorm)))
-    );
+    return ch.toLowerCase() === identifier.toLowerCase() || chNorm === norm;
   });
 }
 
@@ -167,12 +176,39 @@ function pauseAllVideos() {
   } catch (e) {}
 }
 
+function removeDistractions() {
+  try {
+    const comments = document.querySelector("#comments, ytd-comments");
+    if (comments) comments.style.setProperty("display", "none", "important");
+
+    const chat = document.querySelector("#chat, #chat-container, ytd-live-chat-frame, iframe#chatframe");
+    if (chat) chat.style.setProperty("display", "none", "important");
+
+    document.querySelectorAll("ytd-engagement-panel-section-list-renderer[target-id*=\"chat\"], ytd-engagement-panel-section-list-renderer[target-id*=\"Chat\"], [target-id*=\"live-chat\"]").forEach(el => {
+      el.style.setProperty("display", "none", "important");
+    });
+
+    document.querySelectorAll("ytd-item-section-renderer, ytd-engagement-panel-section-list-renderer").forEach(el => {
+      const text = el.innerText || "";
+      if ((text.includes("Live chat replay") || text.includes("Top chat replay") || text.includes("Live chat")) && !el.querySelector("ytd-watch-metadata")) {
+        el.style.setProperty("display", "none", "important");
+      }
+    });
+  } catch (e) {}
+}
+
 // ── Block Overlay ─────────────────────────────────────────────────
 
 function showBlockOverlay(message) {
   currentBlockMessage = message;
   isCurrentPageBlocked = true;
   pauseAllVideos();
+
+  // Hide underlying page content so nothing can show through
+  try {
+    const pageManager = document.querySelector("ytd-page-manager");
+    if (pageManager) pageManager.style.setProperty("display", "none", "important");
+  } catch (e) {}
 
   if (overlayEl && document.contains(overlayEl)) {
     const msgEl = overlayEl.querySelector(".gate-guard-msg");
@@ -183,12 +219,12 @@ function showBlockOverlay(message) {
   overlayEl = document.createElement("div");
   overlayEl.id = "gate-guard-block";
   overlayEl.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: #0a0a0f; z-index: 2147483647;
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    font-family: Inter, -apple-system, sans-serif;
-    color: #fff; text-align: center; padding: 24px; box-sizing: border-box;
+    position: fixed !important; top: 0 !important; left: 0 !important; width: 100vw !important; height: 100vh !important;
+    background: #0a0a0f !important; z-index: 2147483647 !important;
+    display: flex !important; flex-direction: column !important;
+    align-items: center !important; justify-content: center !important;
+    font-family: Inter, -apple-system, sans-serif !important;
+    color: #fff !important; text-align: center !important; padding: 24px !important; box-sizing: border-box !important;
   `;
   overlayEl.innerHTML = `
     <div style="width:72px;height:72px;background:linear-gradient(135deg,#ef4444,#dc2626);border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;box-shadow:0 8px 32px rgba(239,68,68,0.35);">
@@ -197,10 +233,15 @@ function showBlockOverlay(message) {
     <div style="font-size:1.6rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#f87171,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">GATE Guard — Focus Mode</div>
     <div class="gate-guard-msg" style="color:#d4d4d8;font-size:1rem;margin-bottom:24px;line-height:1.5;max-width:520px;">${message}</div>
     <div style="padding:8px 18px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);border-radius:12px;color:#fca5a5;font-size:0.85rem;font-weight:600;letter-spacing:0.5px;">
-      🔒 Direct Video Link Layer Active
+      🔒 GATE Guard Focus Lock Active
     </div>
   `;
-  (document.documentElement || document.body).appendChild(overlayEl);
+
+  if (document.body) {
+    document.body.appendChild(overlayEl);
+  } else {
+    document.documentElement.appendChild(overlayEl);
+  }
   startOverlayGuard();
 }
 
@@ -217,6 +258,8 @@ function startOverlayGuard() {
     if (!overlay || !document.contains(overlay)) {
       overlayEl = null;
       showBlockOverlay(currentBlockMessage);
+    } else if (document.body && overlay.parentNode !== document.body) {
+      document.body.appendChild(overlay);
     }
   }, 200);
 }
@@ -226,6 +269,10 @@ function removeBlockOverlay() {
   currentBlockMessage = "";
   if (guardInterval) { clearInterval(guardInterval); guardInterval = null; }
   if (overlayEl) { overlayEl.remove(); overlayEl = null; }
+  try {
+    const pageManager = document.querySelector("ytd-page-manager");
+    if (pageManager) pageManager.style.removeProperty("display");
+  } catch (e) {}
 }
 
 // ── Channel Extraction & Multi-Identifier Verification ───────────
@@ -233,7 +280,7 @@ function removeBlockOverlay() {
 function getWatchPageChannels() {
   const found = new Set();
 
-  // 1. Meta tag author url (gives exact handle e.g. /@gatewallah_cse_da)
+  // 1. Meta tag author url (exact handle e.g. /@gatewallah_cse_da)
   const authorUrlLink = document.querySelector('span[itemprop="author"] link[itemprop="url"]');
   if (authorUrlLink) {
     const href = authorUrlLink.getAttribute("href") || "";
@@ -331,7 +378,7 @@ function handlePage() {
   injectCSS();
   removeDistractions();
 
-  // 1. LAYER 1: STRICT NON-VIDEO BLOCKING (Dashboard, Search, Feeds)
+  // 1. LAYER 1: STRICT NON-VIDEO BLOCKING (Dashboard, Search, Feeds, Channels)
   if (!isDirectVideoPath(path)) {
     lastUrl = currentUrl;
     pauseAllVideos();
@@ -363,6 +410,21 @@ function handlePage() {
         "Stay focused on GATE preparation.</span>"
       );
       return;
+    }
+
+    // Check Channel page (/@handle)
+    if (path.startsWith("/@")) {
+      const handlePart = path.split("/")[1];
+      const handle = decodeURIComponent(handlePart.substring(1));
+      if (!isChannelAllowed(handle)) {
+        showBlockOverlay(
+          "Channel Blocked<br>" +
+          "<span style=\"font-size:15px;color:#a1a1aa;margin-top:8px;display:block;\">" +
+          "Channel <b>@" + handle + "</b> is not in your approved GATE list.<br>" +
+          "<b>Access denied.</b></span>"
+        );
+        return;
+      }
     }
 
     showBlockOverlay(
