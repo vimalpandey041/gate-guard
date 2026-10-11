@@ -13,6 +13,8 @@ let allowedChannels = [
   "GOClassesforGATECS",
   "GATEWallahbyPW",
   "gatewallah_cse_da",
+  "GATEWallahCSE&DA",
+  "GATE Wallah CSE & DA",
   "Gatecsit-dsai",
   "UnacademyComputerScience",
   "GfG_GATE",
@@ -127,9 +129,24 @@ injectCSS();
 
 // ── Helpers ───────────────────────────────────────────────────────
 
-function isChannelAllowed(handle) {
-  if (!handle) return false;
-  return allowedChannels.some(ch => ch.toLowerCase() === handle.toLowerCase());
+function normalizeChannel(str) {
+  if (!str) return "";
+  return str.toLowerCase().replace(/[^a-z0-9]/g, "");
+}
+
+function isChannelAllowed(identifier) {
+  if (!identifier) return false;
+  const norm = normalizeChannel(identifier);
+  if (!norm) return false;
+  return allowedChannels.some(ch => {
+    if (!ch) return false;
+    const chNorm = normalizeChannel(ch);
+    return (
+      ch.toLowerCase() === identifier.toLowerCase() ||
+      chNorm === norm ||
+      (chNorm.length > 5 && norm.length > 5 && (chNorm.includes(norm) || norm.includes(chNorm)))
+    );
+  });
 }
 
 function isDirectVideoPath(path) {
@@ -211,106 +228,96 @@ function removeBlockOverlay() {
   if (overlayEl) { overlayEl.remove(); overlayEl = null; }
 }
 
-// ── Channel Extraction ────────────────────────────────────────────
+// ── Channel Extraction & Multi-Identifier Verification ───────────
 
-function getWatchPageChannel() {
-  // 1. Try to get from meta tags (instant)
-  const authorNameLink = document.querySelector('span[itemprop="author"] link[itemprop="name"]');
-  if (authorNameLink) {
-    const name = authorNameLink.getAttribute("content");
-    if (name) return name.trim().replace(/\s+/g, "");
-  }
+function getWatchPageChannels() {
+  const found = new Set();
 
+  // 1. Meta tag author url (gives exact handle e.g. /@gatewallah_cse_da)
   const authorUrlLink = document.querySelector('span[itemprop="author"] link[itemprop="url"]');
   if (authorUrlLink) {
     const href = authorUrlLink.getAttribute("href") || "";
-    const match = href.match(/\/@([^\/?#]+)/);
-    if (match) return match[1];
-    const matchFallback = href.match(/\/(channel|c|user)\/([^\/?#]+)/);
-    if (matchFallback) return matchFallback[2];
+    const matchHandle = href.match(/\/@([^\/?#]+)/);
+    if (matchHandle) found.add(matchHandle[1]);
+    const matchId = href.match(/\/(channel|c|user)\/([^\/?#]+)/);
+    if (matchId) found.add(matchId[2]);
   }
 
-  // 2. Try to get from DOM elements
-  const selectors = [
-    "ytd-video-owner-renderer a.yt-simple-endpoint",
-    "#owner a.yt-simple-endpoint",
-    "ytd-channel-name a.yt-simple-endpoint"
-  ];
-  for (const sel of selectors) {
-    const el = document.querySelector(sel);
-    if (el) {
-      const href = el.getAttribute("href") || el.getAttribute("content") || "";
-      const match = href.match(/\/@([^\/?#]+)/);
-      if (match) return match[1];
-      const matchFallback = href.match(/\/(channel|c|user)\/([^\/?#]+)/);
-      if (matchFallback) return matchFallback[2];
+  // 2. Meta tag author name (display name e.g. GATE Wallah CSE & DA)
+  const authorNameLink = document.querySelector('span[itemprop="author"] link[itemprop="name"]');
+  if (authorNameLink) {
+    const name = authorNameLink.getAttribute("content");
+    if (name) {
+      found.add(name);
+      found.add(name.trim().replace(/\s+/g, ""));
     }
   }
 
-  // 3. Fallback: text content
-  const textEl = document.querySelector("ytd-video-owner-renderer ytd-channel-name yt-formatted-string, #owner ytd-channel-name yt-formatted-string, #channel-name .yt-formatted-string");
+  // 3. DOM owner / channel links
+  const ownerLinks = document.querySelectorAll(
+    "#owner a[href*=\"/@\"], ytd-video-owner-renderer a[href*=\"/@\"], ytd-channel-name a[href*=\"/@\"]"
+  );
+  ownerLinks.forEach(link => {
+    const href = link.getAttribute("href") || "";
+    const match = href.match(/\/@([^\/?#]+)/);
+    if (match) found.add(match[1]);
+  });
+
+  // 4. DOM channel name text
+  const textEl = document.querySelector(
+    "ytd-video-owner-renderer ytd-channel-name yt-formatted-string, #owner ytd-channel-name yt-formatted-string, #channel-name .yt-formatted-string"
+  );
   if (textEl && textEl.innerText) {
-    return textEl.innerText.trim().replace(/\s+/g, "");
+    const t = textEl.innerText.trim();
+    found.add(t);
+    found.add(t.replace(/\s+/g, ""));
   }
 
-  // 4. Page title fallback
+  // 5. Document title fallback
   const title = document.title;
   if (title && title.includes(" - ")) {
     const parts = title.split(" - ");
     if (parts.length >= 2) {
-      const possibleChannel = parts[parts.length - 2];
-      if (possibleChannel !== "YouTube") {
-         return possibleChannel.trim().replace(/\s+/g, "");
+      const possible = parts[parts.length - 2].trim();
+      if (possible !== "YouTube") {
+        found.add(possible);
+        found.add(possible.replace(/\s+/g, ""));
       }
     }
   }
 
-  return null;
+  return Array.from(found);
 }
 
 // ── Watch Page Check (SPA-safe) ───────────────────────────────────
 
 let allowedCount = 0;
 function checkWatchPage() {
-  const channel = getWatchPageChannel();
-  if (channel) {
-    if (isChannelAllowed(channel)) {
+  const channels = getWatchPageChannels();
+  if (channels.length > 0) {
+    const allowedMatch = channels.find(ch => isChannelAllowed(ch));
+    if (allowedMatch) {
       removeBlockOverlay();
     } else {
-      showBlockOverlay("Blocked by GATE Guard<br><span style=\"font-size:15px;color:#a1a1aa;margin-top:6px;display:block;\">Channel <b>" + channel + "</b> is not in your approved GATE list.</span>");
+      const displayChannel = channels[0];
+      showBlockOverlay(
+        "Blocked by GATE Guard<br>" +
+        "<span style=\"font-size:15px;color:#a1a1aa;margin-top:6px;display:block;\">" +
+        "Channel <b>" + displayChannel + "</b> is not in your approved GATE list.</span>"
+      );
     }
   } else {
     allowedCount++;
-    if (allowedCount < 20) {
-      setTimeout(checkWatchPage, 400);
+    if (allowedCount < 25) {
+      setTimeout(checkWatchPage, 300);
     } else {
-      showBlockOverlay("Blocked by GATE Guard<br><span style=\"font-size:15px;color:#a1a1aa;margin-top:6px;display:block;\">Could not verify channel — blocked for safety.</span>");
+      showBlockOverlay(
+        "Blocked by GATE Guard<br>" +
+        "<span style=\"font-size:15px;color:#a1a1aa;margin-top:6px;display:block;\">" +
+        "Could not verify channel — blocked for safety.</span>"
+      );
     }
   }
-}
-
-
-function removeDistractions() {
-  // Hide comments
-  const comments = document.querySelector("#comments, ytd-comments");
-  if (comments) comments.style.setProperty("display", "none", "important");
-
-  // Hide live chat
-  const chat = document.querySelector("#chat, #chat-container, ytd-live-chat-frame, iframe#chatframe");
-  if (chat) chat.style.setProperty("display", "none", "important");
-
-  // Hide chat teaser / panels
-  document.querySelectorAll("ytd-engagement-panel-section-list-renderer[target-id*=\"chat\"], ytd-engagement-panel-section-list-renderer[target-id*=\"Chat\"], [target-id*=\"live-chat\"]").forEach(el => {
-    el.style.setProperty("display", "none", "important");
-  });
-
-  // Find any teaser card that contains Live chat text
-  document.querySelectorAll("ytd-item-section-renderer, ytd-engagement-panel-section-list-renderer").forEach(el => {
-    const text = el.innerText || "";
-    if ((text.includes("Live chat replay") || text.includes("Top chat replay") || text.includes("Live chat")) && !el.querySelector("ytd-watch-metadata")) {
-      el.style.setProperty("display", "none", "important");
-    }
-  });
 }
 
 // ── Main Page Handler ─────────────────────────────────────────────
