@@ -14,8 +14,8 @@ cat > /Library/Application\ Support/gateguard_dns.sh << 'DNS'
 #!/bin/bash
 while true; do
   current=$(networksetup -getdnsservers Wi-Fi 2>/dev/null)
-  if [[ "$current" != *"45.90.28.143"* ]]; then
-    networksetup -setdnsservers Wi-Fi 45.90.28.143 45.90.30.143 2a07:a8c0::5f:4eb9 2a07:a8c1::5f:4eb9
+  if [[ "$current" != *"45.90.28.95"* ]]; then
+    networksetup -setdnsservers Wi-Fi 45.90.28.95 45.90.30.95 2a07:a8c0::73:cc39 2a07:a8c1::73:cc39
     dscacheutil -flushcache
   fi
   sleep 3
