@@ -1,11 +1,50 @@
 {
     "logs": [
         {
+            "outputFile": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-mergeDebugResources-2:/values/values.xml",
+            "map": [
+                {
+                    "source": "/Volumes/Development/gate/GateGuardMobile/app/src/main/res/values/strings.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endColumns": "76",
+                        "endOffsets": "127"
+                    }
+                },
+                {
+                    "source": "/Volumes/Development/gate/GateGuardMobile/app/src/main/res/values/themes.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "8",
+                        "endColumns": "12",
+                        "endOffsets": "454"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "132",
+                        "endLines": "9",
+                        "endColumns": "12",
+                        "endOffsets": "531"
+                    }
+                }
+            ]
+        },
+        {
             "outputFile": "com.gateguard.dnslock.app-mergeDebugResources-2:/values/values.xml",
             "map": [
                 {
-                    "source": "/Users/vimalpandey/Library/Application Support/.com.apple.TCC.db.wal-journal/GateGuardMobile/app/src/main/res/values/strings.xml",
+                    "source": "/Volumes/Development/gate/GateGuardMobile/app/src/main/res/values/strings.xml",
                     "from": {
+                        "startLines": "-1",
+                        "startColumns": "-1",
+                        "startOffsets": "-1"
+                    },
+                    "to": {
                         "startLines": "2",
                         "startColumns": "4",
                         "startOffsets": "55",

@@ -1,14 +1,46 @@
 [
     {
-        "merged": "com.gateguard.dnslock.app-merged_res-4:/xml_accessibility_config.xml.flat",
-        "source": "com.gateguard.dnslock.app-main-6:/xml/accessibility_config.xml"
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_bg_btn_red.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/bg_btn_red.xml"
     },
     {
-        "merged": "com.gateguard.dnslock.app-merged_res-4:/drawable_ic_shield.xml.flat",
-        "source": "com.gateguard.dnslock.app-main-6:/drawable/ic_shield.xml"
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/layout_activity_reward.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/layout/activity_reward.xml"
     },
     {
-        "merged": "com.gateguard.dnslock.app-merged_res-4:/xml_device_admin_policies.xml.flat",
-        "source": "com.gateguard.dnslock.app-main-6:/xml/device_admin_policies.xml"
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_bg_btn_green.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/bg_btn_green.xml"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/xml_accessibility_config.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/xml/accessibility_config.xml"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/xml_device_admin_policies.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/xml/device_admin_policies.xml"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_bg_timer_ring.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/bg_timer_ring.xml"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_ic_shield.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/ic_shield.xml"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_bg_btn_emergency.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/bg_btn_emergency.xml"
+    },
+    {
+        "merged": "com.gateguard.dnslock.app-merged_res-4:/raw_blocked_games.txt.flat",
+        "source": "com.gateguard.dnslock.app-main-6:/raw/blocked_games.txt"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_bg_timer_ring_active.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/bg_timer_ring_active.xml"
+    },
+    {
+        "merged": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-merged_res-4:/drawable_bg_btn_quick.xml.flat",
+        "source": "/Users/vimalpandey/.gradle/daemon/8.0/com.gateguard.dnslock.app-main-6:/drawable/bg_btn_quick.xml"
     }
 ]

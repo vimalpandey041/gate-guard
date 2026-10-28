@@ -54,8 +54,8 @@ echo "  ✅ Permission granted"
 echo ""
 echo "  🌐 Setting Private DNS to NextDNS..."
 $ADB shell settings put global private_dns_mode hostname
-$ADB shell settings put global private_dns_specifier bf2769.dns.nextdns.io
-echo "  ✅ DNS set to bf2769.dns.nextdns.io"
+$ADB shell settings put global private_dns_specifier a6693f.dns.nextdns.io
+echo "  ✅ DNS set to a6693f.dns.nextdns.io"
 
 # Step 4: Launch the app to activate Device Admin
 echo ""

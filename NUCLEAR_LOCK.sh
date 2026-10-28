@@ -8,6 +8,16 @@ echo "  No terminal sequential bootout, no AI chat can undo this."
 echo ""
 
 # ═══════════════════════════════════════════════════════
+# CLEANUP OLD FLAGS & STATE (MUST RUN FIRST!)
+# Old files carry schg/nouchg immutable flags from prior runs,
+# which cause "Operation not permitted" when we try to overwrite.
+# ═══════════════════════════════════════════════════════
+chflags noschg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
+chflags noschg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
+chflags nouchg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
+chflags nouchg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
+
+# ═══════════════════════════════════════════════════════
 # LAYER 1: NEXTDNS ENFORCER (Safe for Apple Music & App Store)
 # ═══════════════════════════════════════════════════════
 cat > /Library/Application\ Support/gateguard_dns.sh << 'DNS'
@@ -91,6 +101,16 @@ while true; do
   pkill -9 -f "Antigravity" 2>/dev/null
   killall -9 "Cursor" 2>/dev/null
   killall -9 "Code" 2>/dev/null
+  # Terminal & Script Bypass Vectors (Anti-Loophole)
+  killall -9 "Terminal" 2>/dev/null
+  killall -9 "iTerm2" 2>/dev/null
+  killall -9 "iTerm" 2>/dev/null
+  killall -9 "Warp" 2>/dev/null
+  killall -9 "Alacritty" 2>/dev/null
+  killall -9 "kitty" 2>/dev/null
+  killall -9 "Hyper" 2>/dev/null
+  killall -9 "Script Editor" 2>/dev/null
+  killall -9 "Activity Monitor" 2>/dev/null
   # System Settings (prevents tampering)
   killall -9 "System Settings" 2>/dev/null
   killall -9 "System Preferences" 2>/dev/null
@@ -174,14 +194,6 @@ cat > /Library/LaunchDaemons/com.gateguard.antiloophole.plist << 'PLIST5'
 PLIST5
 
 # ═══════════════════════════════════════════════════════
-# CLEANUP OLD FLAGS & STATE
-# ═══════════════════════════════════════════════════════
-chflags noschg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
-chflags noschg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
-chflags nouchg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
-chflags nouchg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
-
-# ═══════════════════════════════════════════════════════
 # OWNERSHIP + LOAD ALL 5 LAYERS
 # ═══════════════════════════════════════════════════════
 chown root:wheel /Library/LaunchDaemons/com.gateguard.*.plist
@@ -203,7 +215,7 @@ echo ""
 echo "  ✅ ALL 5 INTERLOCKING LAYERS ACTIVE:"
 echo "     🔸 Layer 1: NextDNS Enforcer (Safe for Music/Store)"
 echo "     🔸 Layer 2: Chrome Policy Lock + Incognito Disabled"
-echo "     🔸 Layer 3: App Killer (Safari/Brave/Antigravity/Android Studio/Settings)"
+echo "     🔸 Layer 3: App Killer (Browsers/AI/Terminal/iTerm/Script Editor/Settings)"
 echo "     🔸 Layer 4: Watchdog (Auto-revive every 2s)"
 echo "     🔸 Layer 5: Mutual Anti-Loophole (Counters AI 'bootout' attacks)"
 echo ""

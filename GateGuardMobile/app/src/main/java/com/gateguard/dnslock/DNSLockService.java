@@ -17,15 +17,15 @@ import android.util.Log;
 public class DNSLockService extends Service {
 
     private static final String TAG = "GateGuardDNS";
-    private static final String NEXTDNS_HOSTNAME = "bf2769.dns.nextdns.io";
+    private static final String NEXTDNS_HOSTNAME = "a6693f.dns.nextdns.io";
     private static final String CHANNEL_ID = "gate_guard_dns";
     private static final int NOTIFICATION_ID = 9999;
     private static final long CHECK_INTERVAL = 5000;
-    
+
     // Accessibility auto-re-enable after 5 minutes
     private static final long ACCESSIBILITY_REENABLE_DELAY = 5 * 60 * 1000; // 5 min
     private static final String ACCESSIBILITY_COMPONENT = "com.gateguard.dnslock/.DNSAccessibilityService";
-    
+
     private Handler handler;
     private Runnable dnsChecker;
     private ContentObserver dnsObserver;
@@ -49,7 +49,14 @@ public class DNSLockService extends Service {
             registerDNSObserver();
             startPeriodicCheck();
             enforceDNS();
+        } else {
+            enforceDNS();
+            DNSAccessibilityService.enforceNow();
         }
+
+        // Always re-arm watchdog — ensures it survives force-stop / reboot cycles.
+        WatchdogReceiver.arm(this);
+
         return START_STICKY;
     }
 
@@ -76,6 +83,16 @@ public class DNSLockService extends Service {
                 if (isRunning) {
                     enforceDNS();
                     enforceAccessibility();
+
+                    // Safety net: if a blocked app is somehow still on screen
+                    // (a missed accessibility event), correct the shield.
+                    String fg = ForegroundAppDetector.getForegroundPackage(DNSLockService.this);
+                    if (fg != null) {
+                        DNSAccessibilityService.applyShield(fg, true);
+                    } else if (BlockOverlay.isShowing()) {
+                        BlockOverlay.hide();
+                    }
+
                     handler.postDelayed(this, CHECK_INTERVAL);
                 }
             }
@@ -88,11 +105,11 @@ public class DNSLockService extends Service {
             ContentResolver resolver = getContentResolver();
             String currentMode = Settings.Global.getString(resolver, "private_dns_mode");
             String currentSpecifier = Settings.Global.getString(resolver, "private_dns_specifier");
-            
+
             boolean needsFix = false;
             if (!"hostname".equals(currentMode)) needsFix = true;
             if (!NEXTDNS_HOSTNAME.equals(currentSpecifier)) needsFix = true;
-            
+
             if (needsFix) {
                 Settings.Global.putString(resolver, "private_dns_mode", "hostname");
                 Settings.Global.putString(resolver, "private_dns_specifier", NEXTDNS_HOSTNAME);
@@ -109,9 +126,9 @@ public class DNSLockService extends Service {
         try {
             ContentResolver resolver = getContentResolver();
             String current = Settings.Secure.getString(resolver, "enabled_accessibility_services");
-            
+
             boolean isEnabled = (current != null && current.contains(ACCESSIBILITY_COMPONENT));
-            
+
             if (isEnabled) {
                 // Accessibility is ON, reset timer
                 accessibilityDisabledTime = 0;

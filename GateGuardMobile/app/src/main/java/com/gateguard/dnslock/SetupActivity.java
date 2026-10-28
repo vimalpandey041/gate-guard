@@ -9,7 +9,7 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 /**
- * Setup Activity — runs once to activate Device Admin, then hides itself.
+ * Setup Activity — runs once to activate Device Admin, then starts DNS locking.
  * After activation, the app cannot be uninstalled without first removing Device Admin
  * (which requires ADB on locked phones).
  */
@@ -33,7 +33,8 @@ public class SetupActivity extends Activity {
                     "This prevents the app from being uninstalled.");
             startActivityForResult(intent, REQUEST_ADMIN);
         } else {
-            startServiceAndFinish();
+            // Already set up — start the lock service
+            startServiceAndLock();
         }
     }
 
@@ -43,7 +44,7 @@ public class SetupActivity extends Activity {
         if (requestCode == REQUEST_ADMIN) {
             if (resultCode == RESULT_OK) {
                 Toast.makeText(this, "🔒 GATE Guard DNS Lock activated!", Toast.LENGTH_LONG).show();
-                startServiceAndFinish();
+                startServiceAndLock();
             } else {
                 Toast.makeText(this, "❌ Admin permission denied. DNS lock won't work.", Toast.LENGTH_LONG).show();
                 finish();
@@ -51,17 +52,10 @@ public class SetupActivity extends Activity {
         }
     }
 
-    private void startServiceAndFinish() {
+    private void startServiceAndLock() {
         // Start the DNS Lock service
         Intent serviceIntent = new Intent(this, DNSLockService.class);
         startForegroundService(serviceIntent);
-
-        // Hide from app drawer (optional — makes it harder to find)
-        // Uncomment to hide:
-        // getPackageManager().setComponentEnabledSetting(
-        //     new ComponentName(this, SetupActivity.class),
-        //     PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-        //     PackageManager.DONT_KILL_APP);
 
         finish();
     }

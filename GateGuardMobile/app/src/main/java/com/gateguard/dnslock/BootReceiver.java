@@ -15,9 +15,13 @@ public class BootReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         if (Intent.ACTION_BOOT_COMPLETED.equals(action) ||
             Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)) {
-            
+
+            // Start the foreground service
             Intent serviceIntent = new Intent(context, DNSLockService.class);
             context.startForegroundService(serviceIntent);
+
+            // Also re-arm the watchdog alarm — it gets cleared on reboot.
+            WatchdogReceiver.arm(context);
         }
     }
 }
