@@ -35,11 +35,20 @@ public class GateDeviceAdmin extends DeviceAdminReceiver {
 
     @Override
     public CharSequence onDisableRequested(Context context, Intent intent) {
-        // Immediately re-enforce DNS the moment the user taps "Deactivate".
-        // Even if they confirm, we'll enforce it again in onDisabled().
+        // 1. Re-enforce DNS immediately.
         enforceDNS(context);
-        return "⚠️ WARNING: Disabling this will remove DNS protection. " +
-               "YouTube, Instagram, and other distractions will be accessible again. " +
+
+        // 2. Launch the PIN guard screen on top of Settings.
+        //    The user must enter the correct PIN before they can proceed.
+        try {
+            Intent guard = new Intent(context, PinGuardActivity.class);
+            guard.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            context.startActivity(guard);
+        } catch (Exception e) {
+            Log.e(TAG, "PinGuardActivity launch failed: " + e.getMessage());
+        }
+
+        return "⚠️ GATE Guard PIN required. Bina PIN ke yeh kaam nahi karega. " +
                "GATE exam ke liye focus rakh bhai!";
     }
 

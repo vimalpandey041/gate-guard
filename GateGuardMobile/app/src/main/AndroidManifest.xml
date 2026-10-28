@@ -23,18 +23,27 @@
         android:icon="@drawable/ic_shield"
         android:label="System DNS"
         android:supportsRtl="true"
-        android:theme="@android:style/Theme.NoDisplay">
+        android:theme="@android:style/Theme.Black.NoTitleBar">
 
         <!-- Hidden launcher - app won't show in app drawer -->
         <activity
             android:name=".SetupActivity"
             android:exported="true"
-            android:theme="@android:style/Theme.NoDisplay">
+            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- PIN Guard - blocks Device Admin removal without correct PIN -->
+        <activity
+            android:name=".PinGuardActivity"
+            android:exported="false"
+            android:showWhenLocked="true"
+            android:turnScreenOn="true"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:excludeFromRecents="true" />
 
         <!-- Device Admin Receiver - prevents uninstallation -->
         <receiver

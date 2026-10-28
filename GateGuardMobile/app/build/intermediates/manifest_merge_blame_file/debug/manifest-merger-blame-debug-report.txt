@@ -42,7 +42,7 @@
 22-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:19:22-81
 23
 24    <application
-24-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:21:5-97:19
+24-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:21:5-106:19
 25        android:allowBackup="false"
 25-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:22:9-36
 26        android:debuggable="true"
@@ -53,8 +53,8 @@
 29-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:24:9-35
 30        android:supportsRtl="true"
 30-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:25:9-35
-31        android:theme="@android:style/Theme.NoDisplay" >
-31-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:26:9-55
+31        android:theme="@android:style/Theme.Black.NoTitleBar" >
+31-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:26:9-62
 32
 33        <!-- Hidden launcher - app won't show in app drawer -->
 34        <activity
@@ -63,8 +63,8 @@
 35-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:30:13-42
 36            android:exported="true"
 36-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:31:13-36
-37            android:theme="@android:style/Theme.NoDisplay" >
-37-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:32:13-59
+37            android:theme="@android:style/Theme.Black.NoTitleBar.Fullscreen" >
+37-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:32:13-77
 38            <intent-filter>
 38-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:33:13-36:29
 39                <action android:name="android.intent.action.MAIN" />
@@ -77,109 +77,125 @@
 42            </intent-filter>
 43        </activity>
 44
-45        <!-- Device Admin Receiver - prevents uninstallation -->
-46        <receiver
-46-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:40:9-50:20
-47            android:name="com.gateguard.dnslock.GateDeviceAdmin"
-47-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:41:13-44
-48            android:exported="true"
-48-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:42:13-36
-49            android:permission="android.permission.BIND_DEVICE_ADMIN" >
-49-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:43:13-70
-50            <meta-data
-50-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:44:13-46:65
-51                android:name="android.app.device_admin"
-51-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:45:17-56
-52                android:resource="@xml/device_admin_policies" />
-52-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:46:17-62
+45        <!-- PIN Guard - blocks Device Admin removal without correct PIN -->
+46        <activity
+46-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:40:9-46:49
+47            android:name="com.gateguard.dnslock.PinGuardActivity"
+47-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:41:13-45
+48            android:excludeFromRecents="true"
+48-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:46:13-46
+49            android:exported="false"
+49-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:42:13-37
+50            android:showWhenLocked="true"
+50-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:43:13-42
+51            android:theme="@android:style/Theme.NoTitleBar"
+51-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:45:13-60
+52            android:turnScreenOn="true" />
+52-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:44:13-40
 53
-54            <intent-filter>
-54-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:47:13-49:29
-55                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
-55-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:48:17-82
-55-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:48:25-79
-56            </intent-filter>
-57        </receiver>
-58
-59        <!-- DNS Lock Service - runs forever in background -->
-60        <service
-60-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:53:9-61:19
-61            android:name="com.gateguard.dnslock.DNSLockService"
-61-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:54:13-43
-62            android:enabled="true"
-62-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:55:13-35
-63            android:exported="false"
-63-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:56:13-37
-64            android:foregroundServiceType="specialUse" >
-64-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:57:13-55
-65            <property
-65-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:58:13-60:72
-66                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-66-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:59:17-76
-67                android:value="DNS enforcement for parental control" />
-67-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:60:17-69
-68        </service>
-69
-70        <!-- Watchdog Receiver - AlarmManager-based, survives force-stop -->
-71        <receiver
-71-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:64:9-71:20
-72            android:name="com.gateguard.dnslock.WatchdogReceiver"
-72-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:65:13-45
-73            android:enabled="true"
-73-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:67:13-35
-74            android:exported="false" >
-74-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:66:13-37
-75            <intent-filter>
-75-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:68:13-70:29
-76                <action android:name="com.gateguard.dnslock.WATCHDOG" />
-76-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:69:17-73
-76-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:69:25-70
-77            </intent-filter>
-78        </receiver>
-79
-80        <!-- Boot Receiver - starts service on phone restart -->
-81        <receiver
-81-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:74:9-82:20
-82            android:name="com.gateguard.dnslock.BootReceiver"
-82-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:75:13-41
-83            android:enabled="true"
-83-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:77:13-35
-84            android:exported="true" >
-84-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:76:13-36
-85            <intent-filter>
-85-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:78:13-81:29
-86                <action android:name="android.intent.action.BOOT_COMPLETED" />
-86-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:79:17-79
-86-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:79:25-76
-87                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
-87-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:80:17-84
-87-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:80:25-81
-88            </intent-filter>
-89        </receiver>
-90
-91        <!-- Accessibility Service - UNKILLABLE DNS Guardian -->
-92        <service
-92-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:85:9-95:19
-93            android:name="com.gateguard.dnslock.DNSAccessibilityService"
-93-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:86:13-52
-94            android:exported="true"
-94-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:87:13-36
-95            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
-95-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:88:13-79
-96            <intent-filter>
-96-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:89:13-91:29
-97                <action android:name="android.accessibilityservice.AccessibilityService" />
-97-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:90:17-92
-97-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:90:25-89
-98            </intent-filter>
+54        <!-- Device Admin Receiver - prevents uninstallation -->
+55        <receiver
+55-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:49:9-59:20
+56            android:name="com.gateguard.dnslock.GateDeviceAdmin"
+56-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:50:13-44
+57            android:exported="true"
+57-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:51:13-36
+58            android:permission="android.permission.BIND_DEVICE_ADMIN" >
+58-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:52:13-70
+59            <meta-data
+59-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:53:13-55:65
+60                android:name="android.app.device_admin"
+60-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:54:17-56
+61                android:resource="@xml/device_admin_policies" />
+61-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:55:17-62
+62
+63            <intent-filter>
+63-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:56:13-58:29
+64                <action android:name="android.app.action.DEVICE_ADMIN_ENABLED" />
+64-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:57:17-82
+64-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:57:25-79
+65            </intent-filter>
+66        </receiver>
+67
+68        <!-- DNS Lock Service - runs forever in background -->
+69        <service
+69-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:62:9-70:19
+70            android:name="com.gateguard.dnslock.DNSLockService"
+70-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:63:13-43
+71            android:enabled="true"
+71-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:64:13-35
+72            android:exported="false"
+72-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:65:13-37
+73            android:foregroundServiceType="specialUse" >
+73-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:66:13-55
+74            <property
+74-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:67:13-69:72
+75                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+75-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:68:17-76
+76                android:value="DNS enforcement for parental control" />
+76-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:69:17-69
+77        </service>
+78
+79        <!-- Watchdog Receiver - AlarmManager-based, survives force-stop -->
+80        <receiver
+80-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:73:9-80:20
+81            android:name="com.gateguard.dnslock.WatchdogReceiver"
+81-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:74:13-45
+82            android:enabled="true"
+82-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:76:13-35
+83            android:exported="false" >
+83-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:75:13-37
+84            <intent-filter>
+84-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:77:13-79:29
+85                <action android:name="com.gateguard.dnslock.WATCHDOG" />
+85-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:78:17-73
+85-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:78:25-70
+86            </intent-filter>
+87        </receiver>
+88
+89        <!-- Boot Receiver - starts service on phone restart -->
+90        <receiver
+90-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:83:9-91:20
+91            android:name="com.gateguard.dnslock.BootReceiver"
+91-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:84:13-41
+92            android:enabled="true"
+92-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:86:13-35
+93            android:exported="true" >
+93-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:85:13-36
+94            <intent-filter>
+94-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:87:13-90:29
+95                <action android:name="android.intent.action.BOOT_COMPLETED" />
+95-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:88:17-79
+95-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:88:25-76
+96                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+96-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:89:17-84
+96-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:89:25-81
+97            </intent-filter>
+98        </receiver>
 99
-100            <meta-data
-100-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:92:13-94:64
-101                android:name="android.accessibilityservice"
-101-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:93:17-60
-102                android:resource="@xml/accessibility_config" />
-102-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:94:17-61
-103        </service>
-104    </application>
-105
-106</manifest>
+100        <!-- Accessibility Service - UNKILLABLE DNS Guardian -->
+101        <service
+101-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:94:9-104:19
+102            android:name="com.gateguard.dnslock.DNSAccessibilityService"
+102-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:95:13-52
+103            android:exported="true"
+103-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:96:13-36
+104            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE" >
+104-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:97:13-79
+105            <intent-filter>
+105-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:98:13-100:29
+106                <action android:name="android.accessibilityservice.AccessibilityService" />
+106-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:99:17-92
+106-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:99:25-89
+107            </intent-filter>
+108
+109            <meta-data
+109-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:101:13-103:64
+110                android:name="android.accessibilityservice"
+110-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:102:17-60
+111                android:resource="@xml/accessibility_config" />
+111-->/Volumes/Development/gate/GateGuardMobile/app/src/main/AndroidManifest.xml:103:17-61
+112        </service>
+113    </application>
+114
+115</manifest>
