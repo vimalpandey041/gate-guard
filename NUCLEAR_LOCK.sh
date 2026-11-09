@@ -18,16 +18,36 @@ chflags nouchg /Library/LaunchDaemons/com.gateguard.*.plist 2>/dev/null || true
 chflags nouchg /Library/Application\ Support/gateguard_*.sh 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════
+# APPLY DNS IMMEDIATELY (before appkiller can kill Terminal!)
+# The daemon alone is not enough — appkiller kills Terminal
+# within ~2s, so we set DNS directly here first across all services.
+# ═══════════════════════════════════════════════════════
+echo "  🔧 Applying NextDNS (43d191) to all network interfaces immediately..."
+networksetup -listallnetworkservices 2>/dev/null | grep -v '\*' | grep -v 'An asterisk' | while read -r s; do
+  [ -n "$s" ] && networksetup -setdnsservers "$s" 45.90.28.113 45.90.30.113 2a07:a8c0::43:d191 2a07:a8c1::43:d191 2>/dev/null || true
+done
+dscacheutil -flushcache
+killall -HUP mDNSResponder 2>/dev/null
+if networksetup -getdnsservers Wi-Fi | grep -q "45.90.28.113"; then
+  echo "  ✅ NextDNS applied to Wi-Fi & Network Services"
+else
+  echo "  ⚠️  WARNING: DNS apply failed — daemon will retry every 3s"
+fi
+
+# ═══════════════════════════════════════════════════════
 # LAYER 1: NEXTDNS ENFORCER (Safe for Apple Music & App Store)
 # ═══════════════════════════════════════════════════════
 cat > /Library/Application\ Support/gateguard_dns.sh << 'DNS'
 #!/bin/bash
 while true; do
-  current=$(networksetup -getdnsservers Wi-Fi 2>/dev/null)
-  if [[ "$current" != *"45.90.28.95"* ]]; then
-    networksetup -setdnsservers Wi-Fi 45.90.28.95 45.90.30.95 2a07:a8c0::73:cc39 2a07:a8c1::73:cc39
-    dscacheutil -flushcache
-  fi
+  networksetup -listallnetworkservices 2>/dev/null | grep -v '\*' | grep -v 'An asterisk' | while read -r s; do
+    [ -z "$s" ] && continue
+    current=$(networksetup -getdnsservers "$s" 2>/dev/null)
+    if [[ "$current" != *"45.90.28.113"* ]]; then
+      networksetup -setdnsservers "$s" 45.90.28.113 45.90.30.113 2a07:a8c0::43:d191 2a07:a8c1::43:d191 2>/dev/null || true
+      dscacheutil -flushcache
+    fi
+  done
   sleep 3
 done
 DNS
@@ -47,7 +67,9 @@ cat > /Library/LaunchDaemons/com.gateguard.dns.plist << 'PLIST1'
 PLIST1
 
 # ═══════════════════════════════════════════════════════
-# LAYER 2: CHROME POLICY ENFORCER (every 3 seconds)
+# LAYER 2: CHROME + FIREFOX POLICY ENFORCER (every 3 seconds)
+# Firefox armor: DoH OFF (DoH bypasses NextDNS!), Private
+# Browsing OFF, about:config locked, Safe Mode OFF.
 # ═══════════════════════════════════════════════════════
 cat > /Library/Application\ Support/gateguard_chrome.sh << 'CHROME'
 #!/bin/bash
@@ -61,6 +83,11 @@ while true; do
   defaults write com.google.Chrome ExtensionInstallForcelist -array \
     "elhfcfelcnpeeelpbbcjbbajnfhakjcj;https://clients2.google.com/service/update2/crx"
   defaults write com.google.Chrome IncognitoModeAvailability -int 1
+  # Firefox policy armor (self-healing: rewrites if user deletes it)
+  if [ -d "/Applications/Firefox.app" ]; then
+    mkdir -p "/Applications/Firefox.app/Contents/Resources/distribution"
+    printf '%s' '{"policies":{"DNSOverHTTPS":{"Enabled":false,"Locked":true},"Preferences":{"network.trr.mode":{"Value":0,"Status":"locked"}},"DisablePrivateBrowsing":true,"BlockAboutConfig":true,"DisableSafeMode":true,"DisableProfileRefresh":true,"DisableTelemetry":true}}' > "/Applications/Firefox.app/Contents/Resources/distribution/policies.json"
+  fi
   sleep 3
 done
 CHROME
@@ -85,14 +112,36 @@ PLIST2
 cat > /Library/Application\ Support/gateguard_appkiller.sh << 'APPKILLER'
 #!/bin/bash
 while true; do
-  # Alternative Browsers
-  killall -9 "Safari" 2>/dev/null
-  killall -9 "Brave Browser" 2>/dev/null
+  # Alternative Browsers — FULL LIST (Firefox main process is lowercase
+  # 'firefox' on macOS, so we kill every casing + binary + bundle path)
   killall -9 "Firefox" 2>/dev/null
+  killall -9 "firefox" 2>/dev/null
+  pkill -9 -x firefox 2>/dev/null
+  pkill -9 -f "Firefox.app" 2>/dev/null
+  killall -9 "Firefox Developer Edition" 2>/dev/null
+  killall -9 "Firefox Nightly" 2>/dev/null
+  killall -9 "LibreWolf" 2>/dev/null
+  pkill -9 -f "LibreWolf.app" 2>/dev/null
+  killall -9 "Waterfox" 2>/dev/null
+  killall -9 "Safari" 2>/dev/null
+  killall -9 "Safari Technology Preview" 2>/dev/null
+  killall -9 "Brave Browser" 2>/dev/null
   killall -9 "Tor Browser" 2>/dev/null
   killall -9 "Microsoft Edge" 2>/dev/null
   killall -9 "Opera" 2>/dev/null
+  killall -9 "Opera GX" 2>/dev/null
   killall -9 "Chromium" 2>/dev/null
+  killall -9 "Arc" 2>/dev/null
+  pkill -9 -f "/Arc.app/Contents/MacOS/Arc" 2>/dev/null
+  killall -9 "Vivaldi" 2>/dev/null
+  killall -9 "DuckDuckGo" 2>/dev/null
+  pkill -9 -f "DuckDuckGo.app" 2>/dev/null
+  killall -9 "Min" 2>/dev/null
+  killall -9 "Orion" 2>/dev/null
+  killall -9 "Pale Moon" 2>/dev/null
+  killall -9 "SeaMonkey" 2>/dev/null
+  killall -9 "Epiphany" 2>/dev/null
+  killall -9 "Falkon" 2>/dev/null
   # AI & Dev Tools (Antigravity, Android Studio, IDEs)
   killall -9 "Antigravity IDE" 2>/dev/null
   killall -9 "Antigravity IDE Helper" 2>/dev/null
@@ -199,23 +248,29 @@ PLIST5
 chown root:wheel /Library/LaunchDaemons/com.gateguard.*.plist
 chmod 644 /Library/LaunchDaemons/com.gateguard.*.plist
 
-for s in dns chrome appkiller watchdog antiloophole; do
+# Load safe layers first (appkiller LAST — it kills this Terminal!)
+for s in dns chrome watchdog antiloophole; do
   launchctl enable "system/com.gateguard.$s" 2>/dev/null || true
   launchctl bootstrap system "/Library/LaunchDaemons/com.gateguard.$s.plist" 2>/dev/null || true
 done
+
+# Give DNS daemon time to confirm, then unleash the appkiller
+sleep 5
+launchctl enable "system/com.gateguard.appkiller" 2>/dev/null || true
+launchctl bootstrap system "/Library/LaunchDaemons/com.gateguard.appkiller.plist" 2>/dev/null || true
 
 # ═══════════════════════════════════════════════════════
 # SYSTEM IMMUTABLE (schg) — only Recovery Mode can undo
 # ═══════════════════════════════════════════════════════
 chflags schg /Library/LaunchDaemons/com.gateguard.*.plist
 chflags schg /Library/Application\ Support/gateguard_*.sh
-chflags schg /Volumes/Development/gate/RECOVERY_UNLOCK.sh 2>/dev/null || true
+# (recovery unlock scripts were removed from the repo — nothing else to protect)
 
 echo ""
 echo "  ✅ ALL 5 INTERLOCKING LAYERS ACTIVE:"
 echo "     🔸 Layer 1: NextDNS Enforcer (Safe for Music/Store)"
-echo "     🔸 Layer 2: Chrome Policy Lock + Incognito Disabled"
-echo "     🔸 Layer 3: App Killer (Browsers/AI/Terminal/iTerm/Script Editor/Settings)"
+echo "     🔸 Layer 2: Chrome + Firefox Policy Lock (DoH OFF, Incognito/Private OFF)"
+echo "     🔸 Layer 3: App Killer (ALL Browsers/AI/Terminal/iTerm/Script Editor/Settings)"
 echo "     🔸 Layer 4: Watchdog (Auto-revive every 2s)"
 echo "     🔸 Layer 5: Mutual Anti-Loophole (Counters AI 'bootout' attacks)"
 echo ""

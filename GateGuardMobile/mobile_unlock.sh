@@ -31,10 +31,10 @@ if [ -z "$DEVICE" ]; then
     exit 1
 fi
 
-# Step 1: Remove Device Admin
-echo "  Removing Device Admin..."
+# Step 1: Remove Device Owner (must be done before uninstalling)
+echo "  ⚠️  Removing Device Owner (requires ADB)..."
 $ADB shell dpm remove-active-admin com.gateguard.dnslock/.GateDeviceAdmin 2>/dev/null || true
-echo "  ✅ Device Admin removed"
+echo "  ✅ Device Owner removed"
 
 # Step 2: Force stop service
 echo "  Stopping DNS Lock service..."

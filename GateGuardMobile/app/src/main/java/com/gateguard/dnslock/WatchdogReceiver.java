@@ -35,7 +35,7 @@ public class WatchdogReceiver extends BroadcastReceiver {
     private static final long WATCHDOG_INTERVAL_MS = 60_000; // 1 minute
 
     private static final String ACTION_WATCHDOG = "com.gateguard.dnslock.WATCHDOG";
-    private static final String NEXTDNS_HOSTNAME  = "a6693f.dns.nextdns.io";
+    private static final String NEXTDNS_HOSTNAME  = "e183ec.dns.nextdns.io";
 
     @Override
     public void onReceive(Context context, Intent intent) {

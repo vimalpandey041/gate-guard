@@ -302,7 +302,7 @@ public final class BlockOverlay {
         message.setLayoutParams(msgParams);
 
         TextView hint = new TextView(ctx);
-        hint.setText("This app is blocked by GATE Guard\nTry again later");
+        hint.setText("This app is blocked by Gate Guard\nTry again later");
         hint.setTextColor(0xFF616161);
         hint.setTextSize(12f);
         hint.setGravity(Gravity.CENTER);

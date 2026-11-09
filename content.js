@@ -140,6 +140,30 @@ function injectCSS() {
 }
 injectCSS();
 
+// ── Reward Window (daily 13:00–14:00, Sunday 13:00–15:00) ─────────
+// During the reward window the extension is fully OFF on YouTube:
+// overlay removed, CSS un-injected, all videos allowed.
+
+function isRewardTime() {
+  const now = new Date();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const end = now.getDay() === 0 ? 15 * 60 : 14 * 60; // Sun 15:00, else 14:00
+  return mins >= 13 * 60 && mins < end;
+}
+
+function deactivateBlocking() {
+  removeBlockOverlay();
+  try {
+    const css = document.getElementById("gate-guard-css");
+    if (css) css.remove();
+    // Clear inline styles previously set by removeDistractions()
+    document.querySelectorAll(
+      "#comments, ytd-comments, #chat, #chat-container, ytd-live-chat-frame, iframe#chatframe, " +
+      "ytd-engagement-panel-section-list-renderer, ytd-item-section-renderer"
+    ).forEach(el => el.style.removeProperty("display"));
+  } catch (e) {}
+}
+
 // ── Helpers ───────────────────────────────────────────────────────
 
 function normalizeChannel(str) {
@@ -371,6 +395,7 @@ function checkWatchPage() {
 
 function handlePage() {
   if (window.location.hostname === "music.youtube.com") return;
+  if (isRewardTime()) { deactivateBlocking(); return; } // Reward window — extension OFF
 
   const path = window.location.pathname;
   const currentUrl = window.location.href;
@@ -454,6 +479,7 @@ function handlePage() {
 function setupObserver() {
   new MutationObserver(() => {
     if (window.location.hostname === "music.youtube.com") return;
+    if (isRewardTime()) { deactivateBlocking(); return; } // Reward window — extension OFF
     injectCSS();
     removeDistractions();
     const path = window.location.pathname;
@@ -467,6 +493,16 @@ function setupObserver() {
 
 window.addEventListener("yt-navigate-finish", () => handlePage());
 window.addEventListener("popstate", () => handlePage());
+
+// React to reward window start/end without needing a navigation
+let wasRewardTime = isRewardTime();
+setInterval(() => {
+  const r = isRewardTime();
+  if (r !== wasRewardTime) {
+    wasRewardTime = r;
+    handlePage();
+  }
+}, 15000);
 
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", () => { handlePage(); setupObserver(); });

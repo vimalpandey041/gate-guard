@@ -17,7 +17,7 @@ import android.util.Log;
 public class DNSLockService extends Service {
 
     private static final String TAG = "GateGuardDNS";
-    private static final String NEXTDNS_HOSTNAME = "a6693f.dns.nextdns.io";
+    private static final String NEXTDNS_HOSTNAME = "e183ec.dns.nextdns.io";
     private static final String CHANNEL_ID = "gate_guard_dns";
     private static final int NOTIFICATION_ID = 9999;
     private static final long CHECK_INTERVAL = 5000;
@@ -88,10 +88,15 @@ public class DNSLockService extends Service {
                     // (a missed accessibility event), correct the shield.
                     String fg = ForegroundAppDetector.getForegroundPackage(DNSLockService.this);
                     if (fg != null) {
-                        DNSAccessibilityService.applyShield(fg, true);
+                        DNSAccessibilityService.applyShield(fg, null, true);
                     } else if (BlockOverlay.isShowing()) {
                         BlockOverlay.hide();
                     }
+
+                    // Same idea for tamper screens: close Settings pages even
+                    // when no accessibility event was delivered for them.
+                    DNSAccessibilityService a11y = DNSAccessibilityService.getInstance();
+                    if (a11y != null) a11y.enforceTamperNow();
 
                     handler.postDelayed(this, CHECK_INTERVAL);
                 }
@@ -152,7 +157,7 @@ public class DNSLockService extends Service {
     }
 
     private void createNotificationChannel() {
-        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "DNS Protection", NotificationManager.IMPORTANCE_LOW);
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Gate Guard Protection", NotificationManager.IMPORTANCE_LOW);
         channel.setShowBadge(false);
         NotificationManager manager = getSystemService(NotificationManager.class);
         if (manager != null) manager.createNotificationChannel(channel);
@@ -160,9 +165,9 @@ public class DNSLockService extends Service {
 
     private Notification buildNotification() {
         return new Notification.Builder(this, CHANNEL_ID)
-                .setContentTitle("DNS Protected")
-                .setContentText("GATE Guard active")
-                .setSmallIcon(R.drawable.ic_shield)
+                .setContentTitle("Gate Guard")
+                .setContentText("Protection active")
+                .setSmallIcon(R.drawable.ic_stat_gate)
                 .setOngoing(true)
                 .build();
     }

@@ -13,9 +13,11 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.util.Log;
 
 /**
  * Setup Activity — two-step setup:
@@ -51,8 +53,15 @@ public class SetupActivity extends Activity {
         DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
         ComponentName adminComponent = new ComponentName(this, GateDeviceAdmin.class);
 
+        if (isDeviceOwnerProvisioned()) {
+            // Fully provisioned as Device Owner (via ADB / QR code) — skip the
+            // admin dialog and go straight to locking.
+            startServiceAndLock();
+            return;
+        }
+
         if (dpm.isAdminActive(adminComponent) && PinStore.hasPin(this)) {
-            // Already fully set up — just restart service.
+            // Already fully set up as Device Admin — just restart service.
             startServiceAndLock();
             return;
         }
@@ -61,7 +70,7 @@ public class SetupActivity extends Activity {
             // Step 1: Ask user to set a PIN first.
             setContentView(buildPinSetupLayout());
         } else {
-            // PIN set, but admin not active — go straight to admin request.
+            // PIN already set (e.g. re-activation after removal) — go straight to admin request.
             requestDeviceAdmin(adminComponent);
         }
     }
@@ -75,14 +84,14 @@ public class SetupActivity extends Activity {
         root.setBackgroundColor(0xFF0D0D1A);
         root.setPadding(dp(32), dp(48), dp(32), dp(48));
 
-        TextView icon = new TextView(this);
-        icon.setText("🔐");
-        icon.setTextSize(56f);
-        icon.setGravity(Gravity.CENTER);
-        root.addView(icon, wrapCenter());
+        ImageView icon = new ImageView(this);
+        icon.setImageResource(R.drawable.ic_shield);
+        LinearLayout.LayoutParams iconLp = new LinearLayout.LayoutParams(dp(108), dp(108));
+        iconLp.gravity = Gravity.CENTER_HORIZONTAL;
+        root.addView(icon, iconLp);
 
         TextView title = new TextView(this);
-        title.setText("GATE Guard Setup");
+        title.setText("Gate Guard");
         title.setTextColor(Color.WHITE);
         title.setTextSize(26f);
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -144,13 +153,36 @@ public class SetupActivity extends Activity {
         requestDeviceAdmin(adminComponent);
     }
 
+
+    // ── Device Owner check ───────────────────────────────────────────────────
+
+    /**
+     * Check if this app is the Device Owner.
+     *
+     * NOTE: DevicePolicyManager.getDeviceOwner() exists on real devices (API
+     * 24+) but is missing from some SDK platform jars, so we use reflection
+     * to keep the code compiling.
+     */
+    private boolean isDeviceOwnerProvisioned() {
+        try {
+            DevicePolicyManager dpm = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
+            java.lang.reflect.Method m = dpm.getClass()
+                .getMethod("getDeviceOwner");
+            Object result = m.invoke(dpm);
+            return result != null;
+        } catch (Exception e) {
+            Log.e("SetupActivity", "Failed to check Device Owner via reflection", e);
+            return false;
+        }
+    }
+
     // ── Device Admin ──────────────────────────────────────────────────────────
 
     private void requestDeviceAdmin(ComponentName adminComponent) {
         Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
         intent.putExtra(DevicePolicyManager.EXTRA_DEVICE_ADMIN, adminComponent);
         intent.putExtra(DevicePolicyManager.EXTRA_ADD_EXPLANATION,
-                "GATE Guard needs admin access to protect DNS settings. " +
+                "Gate Guard needs admin access to protect DNS settings. " +
                 "This prevents the app from being uninstalled without PIN.");
         startActivityForResult(intent, REQUEST_ADMIN);
     }
@@ -160,7 +192,7 @@ public class SetupActivity extends Activity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ADMIN) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(this, "🔒 GATE Guard DNS Lock activated!", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "🔒 Gate Guard protection activated!", Toast.LENGTH_LONG).show();
                 startServiceAndLock();
             } else {
                 Toast.makeText(this, "❌ Admin permission denied. DNS lock won't work.", Toast.LENGTH_LONG).show();

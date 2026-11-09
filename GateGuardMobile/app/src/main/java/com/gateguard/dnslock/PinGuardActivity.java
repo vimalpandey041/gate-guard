@@ -34,7 +34,7 @@ import android.widget.Toast;
  */
 public class PinGuardActivity extends Activity {
 
-    private static final String NEXTDNS_HOSTNAME = "a6693f.dns.nextdns.io";
+    private static final String NEXTDNS_HOSTNAME = "e183ec.dns.nextdns.io";
 
     /** How many wrong attempts before a 30-second cool-down kicks in. */
     private static final int MAX_TRIES_BEFORE_COOLDOWN = 3;
@@ -56,7 +56,14 @@ public class PinGuardActivity extends Activity {
         getWindow().addFlags(
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON   |
                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD);
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
+
+        // Android 8.1+ requires this for showing over lock screen
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true);
+            setTurnScreenOn(true);
+        }
 
         setContentView(buildLayout());
         setTitle("");  // Hide title bar text
@@ -78,16 +85,16 @@ public class PinGuardActivity extends Activity {
         root.setBackgroundColor(0xFF0D0D1A);
         root.setPadding(dp(32), dp(48), dp(32), dp(48));
 
-        // Lock icon
-        TextView icon = new TextView(this);
-        icon.setText("🔒");
-        icon.setTextSize(64f);
-        icon.setGravity(Gravity.CENTER);
-        root.addView(icon, wrapCenter());
+        // Gate Guard logo
+        android.widget.ImageView icon = new android.widget.ImageView(this);
+        icon.setImageResource(R.drawable.ic_shield);
+        LinearLayout.LayoutParams iconParams = new LinearLayout.LayoutParams(dp(96), dp(96));
+        iconParams.gravity = Gravity.CENTER_HORIZONTAL;
+        root.addView(icon, iconParams);
 
         // Title
         TextView title = new TextView(this);
-        title.setText("GATE Guard");
+        title.setText("Gate Guard");
         title.setTextColor(Color.WHITE);
         title.setTextSize(28f);
         title.setTypeface(Typeface.DEFAULT_BOLD);
@@ -155,20 +162,8 @@ public class PinGuardActivity extends Activity {
         root.addView(unlockBtn, btnParams);
         unlockBtn.setOnClickListener(v -> onUnlockClicked());
 
-        // Cancel button — goes back without doing anything
-        Button cancelBtn = new Button(this);
-        cancelBtn.setText("Stay focused 💪");
-        cancelBtn.setTextColor(0xFF4CAF50);
-        cancelBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        cancelBtn.setBackgroundColor(0xFF0D2B0D);
-        LinearLayout.LayoutParams cancelParams = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, dp(52));
-        cancelParams.topMargin = dp(12);
-        root.addView(cancelBtn, cancelParams);
-        cancelBtn.setOnClickListener(v -> {
-            enforceDNS();
-            finish();
-        });
+        // ❌ NO Cancel button — the only exit is correct PIN.
+        // Emergency recovery via ADB: RECOVERY_UNLOCK_V2.sh
 
         return root;
     }
@@ -188,9 +183,14 @@ public class PinGuardActivity extends Activity {
         }
 
         if (PinStore.verify(this, entered)) {
-            // Correct PIN — allow the removal to proceed.
-            Toast.makeText(this, "✅ PIN correct. Protection hatai ja rahi hai.", Toast.LENGTH_SHORT).show();
-            finish();
+            // Correct PIN — but removal is NOT granted. Knowing the PIN must
+            // not open the path to disabling Device Admin or uninstalling:
+            // recovery is ADB-only (dpm remove-active-admin / pm uninstall).
+            Toast.makeText(this,
+                    "🔓 PIN correto — mas remoção é só via ADB. Proteção segue ON.",
+                    Toast.LENGTH_LONG).show();
+            enforceDNS();
+            // Stay on the gate. The only way out is HOME; admin stays active.
         } else {
             wrongAttempts++;
             pinInput.setText("");

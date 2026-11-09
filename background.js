@@ -113,6 +113,17 @@ chrome.tabs.onCreated.addListener((tab) => {
   }
 });
 
+// ── Reward Window (daily 13:00–14:00, Sunday 13:00–15:00) ─────────
+// During the reward window the extension's site blocking is OFF
+// (DNS-level blocking stays active). Local browser time is used.
+
+function isRewardTime() {
+  const now = new Date();
+  const mins = now.getHours() * 60 + now.getMinutes();
+  const end = now.getDay() === 0 ? 15 * 60 : 14 * 60; // Sun 15:00, else 14:00
+  return mins >= 13 * 60 && mins < end;
+}
+
 // ── URL Blocking (non-YouTube sites) ───────────────────────────────
 
 function getBlockedDomain(url) {
@@ -144,6 +155,7 @@ function redirectToBlocked(tabId, site) {
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
   if (details.frameId !== 0) return;
+  if (isRewardTime()) return; // Reward window — blocking OFF
   const blockedDomain = getBlockedDomain(details.url);
   if (blockedDomain) redirectToBlocked(details.tabId, blockedDomain);
 });

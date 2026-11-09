@@ -54,16 +54,16 @@ echo "  ✅ Permission granted"
 echo ""
 echo "  🌐 Setting Private DNS to NextDNS..."
 $ADB shell settings put global private_dns_mode hostname
-$ADB shell settings put global private_dns_specifier a6693f.dns.nextdns.io
-echo "  ✅ DNS set to a6693f.dns.nextdns.io"
+$ADB shell settings put global private_dns_specifier e183ec.dns.nextdns.io
+echo "  ✅ DNS set to e183ec.dns.nextdns.io"
 
-# Step 4: Launch the app to activate Device Admin
+# Step 4: Provision as Device Owner (no user interaction needed)
 echo ""
-echo "  🚀 Launching app — ACCEPT the Device Admin prompt on your phone!"
-$ADB shell am start -n com.gateguard.dnslock/.SetupActivity
-echo ""
-echo "  ⏳ Waiting for you to accept Device Admin on phone..."
-sleep 10
+echo "  🔄 Provisioning GATE Guard as Device Owner..."
+$ADB shell dpm set-device-owner \
+  com.gateguard.dnslock/.GateDeviceAdmin \
+  --user 0
+echo "  ✅ Device Owner provisioned"
 
 # Step 5: Verify
 echo ""
@@ -80,9 +80,9 @@ echo "  ════════════════════════
 echo ""
 echo "  📱 What's protected:"
 echo "     🔒 DNS permanently set to NextDNS"
-echo "     🔒 App can't be uninstalled (Device Admin)"
+echo "     🔒 App is DEVICE OWNER — cannot be removed without factory reset"
 echo "     🔒 DNS resets itself if changed"
 echo "     🔒 Survives phone restart"
 echo ""
-echo "  🔓 To unlock: bash mobile_unlock.sh"
+echo "  🔓 To unlock: bash mobile_unlock.sh (requires ADB)"
 echo ""

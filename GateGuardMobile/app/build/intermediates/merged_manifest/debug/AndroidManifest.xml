@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="24"
+        android:minSdkVersion="26"
         android:targetSdkVersion="35" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
@@ -26,7 +26,7 @@
         android:debuggable="true"
         android:extractNativeLibs="false"
         android:icon="@drawable/ic_shield"
-        android:label="System DNS"
+        android:label="Gate Guard"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Black.NoTitleBar" >
 
@@ -52,6 +52,7 @@
             android:turnScreenOn="true" />
 
         <!-- Device Admin Receiver - prevents uninstallation -->
+        <!-- Device Admin Receiver — also acts as Device Owner -->
         <receiver
             android:name="com.gateguard.dnslock.GateDeviceAdmin"
             android:exported="true"

@@ -21,7 +21,7 @@
     <application
         android:allowBackup="false"
         android:icon="@drawable/ic_shield"
-        android:label="System DNS"
+        android:label="Gate Guard"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.Black.NoTitleBar">
 
@@ -46,6 +46,7 @@
             android:excludeFromRecents="true" />
 
         <!-- Device Admin Receiver - prevents uninstallation -->
+        <!-- Device Admin Receiver — also acts as Device Owner -->
         <receiver
             android:name=".GateDeviceAdmin"
             android:exported="true"

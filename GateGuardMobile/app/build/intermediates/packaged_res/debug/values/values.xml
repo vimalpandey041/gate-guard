@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="accessibility_desc">System DNS protection service</string>
+    <string name="accessibility_desc">Gate Guard protection service</string>
 </resources>
